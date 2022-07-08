@@ -7,9 +7,9 @@ namespace Microsoft.Docs.MarkdigExtensions;
 
 public class TripleColonBlock : ContainerBlock, ITripleColon
 {
-    public IDictionary<string, string> RenderProperties { get; set; }
-
     public ITripleColonExtensionInfo Extension { get; set; }
+
+    public string Body { get; set; }
 
     public TripleColonBlock(BlockParser parser)
         : base(parser) { }
@@ -23,9 +23,9 @@ public class TripleColonBlock : ContainerBlock, ITripleColon
 
 internal interface ITripleColon
 {
-    public IDictionary<string, string> RenderProperties { get; set; }
-
     public ITripleColonExtensionInfo Extension { get; set; }
+
+    public string Body { get; set; }
 
     public bool Closed { get; set; }
 

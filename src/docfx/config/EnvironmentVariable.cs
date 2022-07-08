@@ -13,11 +13,22 @@ public static class EnvironmentVariable
 
     public static string? RepositoryUrl => GetValue("DOCFX_REPOSITORY_URL");
 
+    public static string? PublishRepositoryUrl => GetValue("DOCFX_PUBLISH_REPOSITORY_URL");
+
+    public static string? PullRequestRepositoryUrl => GetValue("DOCFX_PULL_REQUEST_REPOSITORY_URL");
+
     public static string? RepositoryBranch => GetValue("DOCFX_REPOSITORY_BRANCH");
+
+    public static string? PublishRepositoryBranch => GetValue("DOCFX_PUBLISH_REPOSITORY_BRANCH");
+
+    public static string? PullRequestRepositoryBranch => GetValue("DOCFX_PULL_REQUEST_REPOSITORY_BRANCH");
 
     public static string? CorrelationId => GetValue("DOCFX_CORRELATION_ID");
 
     public static string? SessionId => GetValue("DOCFX_SESSION_ID");
+
+    // TODO: remove after switch complete
+    public static string? PPEDefaultDomainHostName => GetValue("DOCFX_PPE_DEFAULT_DOMAIN_HOST_NAME");
 
     private static string? GetValue(string name)
     {

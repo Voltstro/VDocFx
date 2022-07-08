@@ -14,6 +14,7 @@ internal class PublishModelBuilder
     private readonly string _locale;
     private readonly SourceMap _sourceMap;
     private readonly DocumentProvider _documentProvider;
+    private readonly ContributionProvider _contributionProvider;
 
     private readonly ConcurrentDictionary<FilePath, (JObject? metadata, string? outputPath)> _buildOutput = new();
 
@@ -23,7 +24,8 @@ internal class PublishModelBuilder
         MonikerProvider monikerProvider,
         BuildOptions buildOptions,
         SourceMap sourceMap,
-        DocumentProvider documentProvider)
+        DocumentProvider documentProvider,
+        ContributionProvider contributionProvider)
     {
         _config = config;
         _errors = errors;
@@ -31,6 +33,7 @@ internal class PublishModelBuilder
         _locale = buildOptions.Locale;
         _sourceMap = sourceMap;
         _documentProvider = documentProvider;
+        _contributionProvider = contributionProvider;
     }
 
     public void AddOrUpdate(FilePath file, JObject? metadata, string? outputPath)
@@ -48,17 +51,20 @@ internal class PublishModelBuilder
             {
                 _buildOutput.TryGetValue(sourceFile, out var buildOutput);
 
+                var sourceFilePath = _sourceMap.GetOriginalFilePath(sourceFile)?.Path ?? sourceFile.Path;
+
                 var publishItem = new PublishItem
                 {
                     Url = _documentProvider.GetSiteUrl(sourceFile),
                     Path = buildOutput.outputPath,
-                    SourceFile = sourceFile,
-                    SourcePath = _sourceMap.GetOriginalFilePath(sourceFile)?.Path ?? sourceFile.Path,
+                    SourceFile = sourceFile.Origin == FileOrigin.Redirection ? null : sourceFile,
+                    SourcePath = sourceFile.Origin == FileOrigin.Redirection ? null : sourceFilePath,
+                    SourceUrl = _contributionProvider.GetReportGitUrl(sourceFile),
                     Locale = _locale,
                     Monikers = _monikerProvider.GetFileLevelMonikers(_errors, sourceFile),
                     ConfigMonikerRange = _monikerProvider.GetConfigMonikerRange(sourceFile),
                     HasError = _errors.FileHasError(sourceFile),
-                    ExtensionData = RemoveComplexValue(buildOutput.metadata),
+                    ExtensionData = buildOutput.metadata,
                 };
 
                 publishItems.Add(sourceFile, publishItem);
@@ -91,42 +97,5 @@ internal class PublishModelBuilder
         var fileManifests = publishItems.ToDictionary(item => item.Key, item => item.Value);
 
         return (model, fileManifests);
-    }
-
-    private static JObject? RemoveComplexValue(JObject? metadata)
-    {
-        if (metadata is null)
-        {
-            return null;
-        }
-
-        var keysToRemove = default(List<string>);
-
-        foreach (var (key, value) in metadata)
-        {
-            if (value is JObject)
-            {
-                keysToRemove ??= new List<string>();
-                keysToRemove.Add(key);
-                continue;
-            }
-
-            if (value is JArray array && !array.All(item => item is JValue))
-            {
-                keysToRemove ??= new List<string>();
-                keysToRemove.Add(key);
-                continue;
-            }
-        }
-
-        if (keysToRemove != null)
-        {
-            foreach (var key in keysToRemove)
-            {
-                metadata.Remove(key);
-            }
-        }
-
-        return metadata;
     }
 }

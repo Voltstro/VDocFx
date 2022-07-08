@@ -430,63 +430,72 @@ outputs:
     }
   docs/a.mta.json:
 ---
-# Support metadata schema definition defined in template
-inputs:
-  docfx.yml:
-  a.md: |
-    ---    
-    foo: []
-    ---
-  _themes/ContentTemplate/schemas/Metadata.schema.json: |
-    {
-      "properties": {
-          "foo": { "type": "string" },
-      }
-    }
+# output defined xrefs per file to structure json
+repos:
+  https://docs.com/test#test:
+    - files:
+        docfx.yml:
+        docs/a.md: |
+          ---
+          uid: abc
+          breadcrumb_path: "/breadcrumb_path"
+          author: xxx
+          ---
+          # Title
 outputs:
-  .errors.log: |
-    {"message_severity":"warning","code":"unexpected-type","file":"a.md","line":2,"end_line":2,"column":6,"end_column":6}
-  a.json:
+  docs/a.json: |
+    {      
+      "author":"xxx", 
+      "uid": "abc", 
+      "breadcrumb_path": "/breadcrumb_path", 
+      "title": "Title",  
+      "xrefs": [
+          {
+            "href": "https://docs.com/docs/a?branch=test",
+            "name": "abc",
+            "uid": "abc",
+          }
+      ]
+    }
+  .xrefmap.json: | 
+    {
+      "references":[
+        {"uid": "abc", "name": "abc" ,"href": "https://docs.com/docs/a?branch=test"},       
+      ]
+    }
 ---
-# Transform metadata based on metadata schema
-inputs:
-  docfx.yml: |
-    globalMetadata:
-      bar: docs/data.yml
-  docs/page.md: |
-    ---
-    foo: data.yml
-    ---
-  docs/data.yml: |
-    #YamlMime:TestData
-    metadata:
-      foo: data.yml
-  docs/yml-page.yml: |
-    #YamlMime:TestData
-    metadata:
-      foo: data.yml
-  docs/TOC.yml: |
-    metadata:
-      foo: data.yml
-  _themes/ContentTemplate/schemas/Metadata.schema.json: |
-    {
-      "properties": {
-          "foo": { "contentType": "href" },
-          "bar": { "contentType": "href" }
+# build page json, output defined xrefs to page mta.json and raw.page.json
+repos:
+  https://docs.com/test#test:
+    - files:
+        docfx.yml: |
+          outputType: pageJson
+        docs/a.md: |
+          ---
+          uid: abc
+          breadcrumb_path: "/breadcrumb_path"
+          author: xxx
+          ---
+          # Title
+outputs:  
+  docs/a.raw.page.json: | 
+    { 
+      "rawMetadata": {
+        "xrefs": [
+          {"uid": "abc", "name": "abc", "href": "https://docs.com/docs/a?branch=test"}
+        ]
       }
     }
-  _themes/ContentTemplate/schemas/TestData.schema.json: |
-    { }
-outputs:
-  docs/page.json: |
-    { "foo": "data", "bar": "data" }
-  docs/yml-page.json: |
-    {
-      "metadata": { "foo": "data", "bar": "data" }
+  docs/a.mta.json: |
+    {       
+      "xrefs": [
+          {"uid": "abc", "name": "abc", "href": "https://docs.com/docs/a?branch=test"}
+        ]
     }
-  docs/data.json: |
-    { "foo": undefined, "bar": undefined }
-  docs/toc.json: |
+  .xrefmap.json: | 
     {
-      "metadata": { "foo": "data", "bar": "data" }
+      "references":[
+        {"uid": "abc", "name": "abc" ,"href": "https://docs.com/docs/a?branch=test"},       
+      ]
     }
+---

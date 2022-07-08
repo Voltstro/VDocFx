@@ -58,7 +58,7 @@ inputs:
 outputs:
   .publish.json: |
     {
-      "files": [{ "url": "/a", "redirect_url": "/b", "path": undefined, "source_path": "a.md", "hash": undefined }]
+      "files": [{ "url": "/a", "redirect_url": "/b", "path": undefined, "hash": undefined }]
     }
 ---
 # Publish manifest for articles contains custom metadata
@@ -881,3 +881,115 @@ outputs:
           }
       }
     }
+---
+# provide source url in .publish.json for content, toc and resource pages but not redirection pages.
+repos:
+  https://github.com/test/repo:
+  - files:
+      docfx.yml:
+      redirections.yml: |
+        redirections:
+          missing.md: /a
+      a.md:
+      toc.yml:
+      image.png:
+outputs:
+   a.json:
+   image.png:
+   toc.json:
+   .publish.json: |
+      {
+        "files": [
+          {
+              "source_path": undefined,
+              "source_url": undefined,             
+          },
+          {
+              "source_path": "a.md",
+              "source_url": "https://github.com/test/repo/blob/main/a.md"
+          },
+          {
+              "source_path": "image.png",
+              "source_url": "https://github.com/test/repo/blob/main/image.png"
+          },
+          {
+              "source_path": "toc.yml",
+              "source_url": "https://github.com/test/repo/blob/main/toc.yml"
+          }
+        ]
+      }
+---
+# source url also works for CRR
+repos:
+  https://github.com/ops1/repo:
+  - files:
+      docfx.yml: |
+        routes:
+            "crr/": "crr"
+        dependencies:
+              crr:
+                url: https://github.com/ops1/crr
+                branch: live
+                includeInBuild: true
+  https://github.com/ops1/crr#live:
+  - files:
+      a.md:
+outputs:
+  crr/a.json:
+  .publish.json: |
+    {
+      "files": [
+        {
+            "source_path": "crr/a.md",
+            "source_url": "https://github.com/ops1/crr/blob/live/a.md"
+        }
+      ]
+    }
+---
+# for pull request builds, source urls in .publish.json point to pull request source repo, but crr files are not affected
+repos:
+  https://github.com/ops1/repo:
+  - files:
+      docfx.yml: |
+        routes:
+            "crr/": "crr"
+        dependencies:
+              crr:
+                url: https://github.com/ops1/crr
+                branch: live
+                includeInBuild: true
+        pullRequestRepositoryUrl: https://github.com/ops1-author/repo-fork
+        pullRequestRepositoryBranch: forked-patch-1
+      a.md:
+      toc.yml:
+      image.png:
+  https://github.com/ops1/crr#live:
+  - files:
+      b.md:
+outputs:
+  a.json:
+  image.png:
+  toc.json:
+  crr/b.json:
+  .publish.json: |
+    {
+      "files": [
+        {
+            "source_path": "a.md",
+            "source_url": "https://github.com/ops1-author/repo-fork/blob/forked-patch-1/a.md"
+        },
+        {
+            "source_path": "crr/b.md",
+            "source_url": "https://github.com/ops1/crr/blob/live/b.md"
+        },
+        {
+            "source_path": "image.png",
+            "source_url": "https://github.com/ops1-author/repo-fork/blob/forked-patch-1/image.png"
+        },
+        {
+            "source_path": "toc.yml",
+            "source_url": "https://github.com/ops1-author/repo-fork/blob/forked-patch-1/toc.yml"
+        }
+      ]
+    }
+---

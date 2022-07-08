@@ -425,6 +425,7 @@ plugable
 plugin
 png
 postbuild
+powerapps
 powerbi
 powershell
 ppe
@@ -550,6 +551,7 @@ testsnippet
 testtoken
 textarea
 tfoot
+tfs
 thead
 tif
 timespan

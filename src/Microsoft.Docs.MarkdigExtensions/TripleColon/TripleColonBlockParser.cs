@@ -52,14 +52,13 @@ public class TripleColonBlockParser : BlockParser
 
         if (!extension.TryValidateAncestry(processor.CurrentContainer, logError) ||
             !TryMatchAttributes(ref slice, out var attributes, extension.SelfClosing, logError) ||
-            !extension.TryProcessAttributes(attributes, out var htmlAttributes, out var renderProperties, logError, logWarning, block))
+            !extension.TryProcessAttributes(attributes, out var htmlAttributes, logError, logWarning, block))
         {
             return BlockState.None;
         }
 
         block.Extension = extension;
         block.Attributes = attributes;
-        block.RenderProperties = renderProperties;
 
         if (htmlAttributes != null)
         {
@@ -118,6 +117,8 @@ public class TripleColonBlockParser : BlockParser
 
             if (!ExtensionsHelper.MatchStart(ref slice, ":::"))
             {
+                // create a block for the image long description
+                ((TripleColonBlock)block).Body = slice.ToString();
                 ExtensionsHelper.ResetLineIndent(processor);
                 return BlockState.Continue;
             }
