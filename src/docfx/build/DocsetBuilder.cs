@@ -197,17 +197,16 @@ internal class DocsetBuilder
 
             // TODO: decouple files and dependencies from legacy.
             var dependencyMap = _dependencyMapBuilder.Build();
-            var legacyContext = new LegacyContext(_config, _buildOptions, output, _sourceMap, _monikerProvider, _documentProvider);
 
             MemoryCache.Clear();
 
+            var extraShitOutput = new Output($"{_buildOptions.OutputPath}/{_config.BasePath}", _input, _config.DryRun);
             Parallel.Invoke(
-                () => _templateEngine.CopyAssetsToOutput(output, _config.SelfContained),
-                () => output.WriteJson(".xrefmap.json", xrefMapModel),
-                () => output.WriteJson(".publish.json", publishModel),
-                () => output.WriteJson(".dependencymap.json", dependencyMap.ToDependencyMapModel()),
-                () => output.WriteJson(".links.json", _fileLinkMapBuilder.Build(publishModel)),
-                () => Legacy.ConvertToLegacyModel(_buildOptions.DocsetPath, legacyContext, fileManifests, dependencyMap));
+                () => _templateEngine.CopyAssetsToOutput(extraShitOutput, _config.SelfContained),
+                () => output.WriteJson($"{_config.BasePath}/.xrefmap.json", xrefMapModel),
+                () => output.WriteJson($"{_config.BasePath}/.publish.json", publishModel),
+                () => output.WriteJson($"{_config.BasePath}/.dependencymap.json", dependencyMap.ToDependencyMapModel()),
+                () => output.WriteJson($"{_config.BasePath}/.links.json", _fileLinkMapBuilder.Build(publishModel)));
 
             new OpsPostProcessor(_config, _errors, _buildOptions, _opsAccessor, _jsonSchemaTransformer.GetValidateExternalXrefs()).Run();
         }
