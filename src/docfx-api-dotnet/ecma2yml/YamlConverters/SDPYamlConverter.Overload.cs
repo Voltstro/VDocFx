@@ -1,4 +1,4 @@
-﻿using ECMA2Yaml.Models;
+using ECMA2Yaml.Models;
 using ECMA2Yaml.Models.SDP;
 using System.Collections.Generic;
 using System.Linq;

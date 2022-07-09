@@ -137,6 +137,7 @@ internal class XrefResolver
 
         var localizable = IsNameLocalizable(xrefSpec);
         _fileLinkMapBuilder.AddFileLink(inclusionRoot, referencingFile, xrefSpec.Href, uid.Source);
+
         return (null, new XrefLink(href, xrefSpec.GetName() ?? xrefSpec.Uid, xrefSpec.DeclaringFile, localizable));
     }
 
@@ -336,13 +337,13 @@ internal class XrefResolver
 
             var dependencyType = GetDependencyType(referencingFile, spec);
             _dependencyMapBuilder.AddDependencyItem(referencingFile, spec.DeclaringFile, dependencyType);
-
+            
             // Output absolute URL starting from Architecture and TSType
-            var href = JsonSchemaProvider.OutputAbsoluteUrl(_documentProvider.GetMime(inclusionRoot))
-                ? spec.Href
-                : UrlUtility.GetRelativeUrl(_documentProvider.GetSiteUrl(inclusionRoot), spec.Href);
+            //var href = JsonSchemaProvider.OutputAbsoluteUrl(_documentProvider.GetMime(inclusionRoot))
+            //    ? spec.Href
+            //    : UrlUtility.GetRelativeUrl(_documentProvider.GetSiteUrl(inclusionRoot), spec.Href);
 
-            return (spec, href);
+            return (spec, spec.Href);
         }
         return default;
     }

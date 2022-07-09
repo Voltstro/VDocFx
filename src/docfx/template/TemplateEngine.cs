@@ -201,7 +201,6 @@ internal class TemplateEngine
         {
             HtmlUtility.GetBookmarks(ref token, bookmarks);
             HtmlUtility.AddLinkType(ref token);
-            HtmlUtility.AddLocaleIfMissingForAbsolutePath(ref token, _locale);
 
             if (token.Type == HtmlTokenType.Text)
             {
@@ -236,7 +235,6 @@ internal class TemplateEngine
     {
         var result = HtmlUtility.TransformHtml(html, (ref HtmlReader reader, ref HtmlWriter writer, ref HtmlToken token) =>
         {
-            HtmlUtility.AddLocaleIfMissingForAbsolutePath(ref token, _locale);
         });
 
         return LocalizationUtility.AddLeftToRightMarker(_cultureInfo, result);

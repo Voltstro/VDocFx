@@ -84,7 +84,7 @@ internal class Config : PreloadConfig
     /// <summary>
     /// Gets whether to lowercase all URLs and output file path.
     /// </summary>
-    public bool LowerCaseUrl { get; init; } = true;
+    public bool LowerCaseUrl { get; init; }
 
     /// <summary>
     /// Gets whether dependencies such as images and template styles

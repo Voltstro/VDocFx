@@ -270,7 +270,7 @@ internal class DocumentProvider
     /// </summary>
     private string GetCanonicalUrl(string siteUrl)
     {
-        return $"https://{_config.HostName}/{_buildOptions.Locale}{siteUrl}";
+        return $"https://{_config.HostName}/{siteUrl}";
     }
 
     private PathString ApplyRoutes(PathString path)
