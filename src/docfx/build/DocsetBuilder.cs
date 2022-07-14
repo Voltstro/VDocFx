@@ -200,13 +200,19 @@ internal class DocsetBuilder
 
             MemoryCache.Clear();
 
-            var extraShitOutput = new Output($"{_buildOptions.OutputPath}/{_config.BasePath}", _input, _config.DryRun);
+            var basePath = string.Empty;
+            if (!string.IsNullOrWhiteSpace(_buildOptions.OutputPath))
+            {
+                basePath = $"{_buildOptions.OutputPath}";
+            }
+
+            var extraShitOutput = new Output($"{basePath}{_config.BasePath}", _input, _config.DryRun);
             Parallel.Invoke(
                 () => _templateEngine.CopyAssetsToOutput(extraShitOutput, _config.SelfContained),
-                () => output.WriteJson($"{_config.BasePath}/.xrefmap.json", xrefMapModel),
-                () => output.WriteJson($"{_config.BasePath}/.publish.json", publishModel),
-                () => output.WriteJson($"{_config.BasePath}/.dependencymap.json", dependencyMap.ToDependencyMapModel()),
-                () => output.WriteJson($"{_config.BasePath}/.links.json", _fileLinkMapBuilder.Build(publishModel)));
+                () => output.WriteJson($"{basePath}.xrefmap.json", xrefMapModel),
+                () => output.WriteJson($"{basePath}.publish.json", publishModel),
+                () => output.WriteJson($"{basePath}.dependencymap.json", dependencyMap.ToDependencyMapModel()),
+                () => output.WriteJson($"{basePath}.links.json", _fileLinkMapBuilder.Build(publishModel)));
 
             new OpsPostProcessor(_config, _errors, _buildOptions, _opsAccessor, _jsonSchemaTransformer.GetValidateExternalXrefs()).Run();
         }

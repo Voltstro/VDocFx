@@ -84,7 +84,7 @@ internal class Config : PreloadConfig
     /// <summary>
     /// Gets whether to lowercase all URLs and output file path.
     /// </summary>
-    public bool LowerCaseUrl { get; init; }
+    public bool LowerCaseUrl { get; init; } = true;
 
     /// <summary>
     /// Gets whether dependencies such as images and template styles
@@ -403,7 +403,7 @@ internal class Config : PreloadConfig
         if (LowerCaseUrl)
         {
             HostName = HostName.ToLowerInvariant();
-            BasePath = new(BasePath.Value.ToLowerInvariant());
+            //BasePath = new(BasePath.Value.ToLowerInvariant());
         }
     }
 }
