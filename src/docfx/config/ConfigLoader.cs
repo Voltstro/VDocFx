@@ -102,7 +102,6 @@ internal static class ConfigLoader
         JsonUtility.Merge(unionProperties, configObject, envConfig, globalConfig, extendConfig, opsConfig, docfxConfig, cliConfig);
         var config = JsonUtility.ToObject<Config>(errors, configObject);
 
-        Telemetry.TrackDocfxConfig(config.Name, docfxConfig);
         return (config, buildOptions, packageResolver, fileResolver, opsAccessor);
     }
 

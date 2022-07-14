@@ -11,7 +11,6 @@ internal static class Restore
 
         var package = new LocalPackage(options.WorkingDirectory);
         var repository = Repository.Create(package.BasePath);
-        Telemetry.SetRepository(repository?.Url, repository?.Branch);
 
         var docsets = ConfigLoader.FindDocsets(errors, package, options, repository);
         if (docsets.Length == 0)

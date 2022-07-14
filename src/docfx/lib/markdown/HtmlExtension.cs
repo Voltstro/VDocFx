@@ -43,13 +43,6 @@ internal static class HtmlExtension
                         return false;
                 }
             });
-
-            Telemetry.TrackHtmlElement(
-                file,
-                documentProvider.GetContentType(rootFile),
-                documentProvider.GetMime(rootFile),
-                elementCount,
-                (tagName, attributeName) => htmlSanitizer.IsAllowedHtml(tagName, attributeName));
         });
 
         string ProcessHtml(

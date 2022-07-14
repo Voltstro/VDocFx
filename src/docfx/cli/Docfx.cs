@@ -26,17 +26,6 @@ public static class Docfx
         {
             return -99999;
         }
-        finally
-        {
-            try
-            {
-                Telemetry.Flush();
-            }
-            catch (Exception ex)
-            {
-                PrintFatalErrorMessage(ex);
-            }
-        }
     }
 
     internal static int Run(string[] args, Package? package = null)
@@ -54,8 +43,6 @@ public static class Docfx
         };
 
         var command = rootCommand.Parse(args);
-        var name = command.CommandResult.Command == rootCommand ? "docfx" : $"docfx/{command.CommandResult?.Command.Name}";
-        using var operation = Telemetry.StartOperation(name);
 
         try
         {
@@ -64,8 +51,6 @@ public static class Docfx
         catch (Exception ex)
         {
             PrintFatalErrorMessage(ex);
-            Telemetry.TrackException(ex);
-            operation.Telemetry.Success = false;
             throw;
         }
     }

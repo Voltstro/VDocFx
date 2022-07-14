@@ -48,7 +48,6 @@ internal class LanguageServerHost
                 options.OnUnhandledException = (e) =>
                 {
                     notificationListener?.OnException(e);
-                    Telemetry.TrackException(e);
                 };
             },
             cancellationToken);

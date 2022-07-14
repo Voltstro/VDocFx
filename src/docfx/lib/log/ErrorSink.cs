@@ -37,11 +37,6 @@ internal class ErrorSink
 
             if (exceedMaxAllowed)
             {
-                if (_errors.Count >= MaxRemoveDeduplicationLogCount || _errors.Add(error))
-                {
-                    Telemetry.TrackFileLogCount(error.Level, error.Source?.File);
-                }
-
                 if (!_exceedMax)
                 {
                     _exceedMax = true;
@@ -55,16 +50,6 @@ internal class ErrorSink
             {
                 return ErrorSinkResult.Ignore;
             }
-
-            Telemetry.TrackFileLogCount(error.Level, error.Source?.File);
-            var count = error.Level switch
-            {
-                ErrorLevel.Error => ++ErrorCount,
-                ErrorLevel.Warning => ++WarningCount,
-                ErrorLevel.Suggestion => ++SuggestionCount,
-                ErrorLevel.Info => ++InfoCount,
-                _ => 0,
-            };
 
             return ErrorSinkResult.Ok;
         }

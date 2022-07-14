@@ -60,7 +60,6 @@ internal class LanguageServerBuilder
                 using var progressReporter = await CreateProgressReporter();
 
                 progressReporter.Report("Start build...");
-                var operation = Telemetry.StartMetricOperation("realTimeBuild");
 
                 var errors = new ErrorList();
                 var filesToBuild = _languageServerPackage.GetAllFilesInMemory();
@@ -70,12 +69,10 @@ internal class LanguageServerBuilder
                 // The current build can only be completed when the credential refresh request response get handled.
                 // But the responses of language server are handled sequentially, which cause the deadlock.
                 await Task.Yield();
-                Telemetry.SetIsRealTimeBuild(true);
                 _builder.Build(errors, progressReporter, filesToBuild.Select(f => f.Value).ToArray());
 
                 PublishDiagnosticsParams(errors, filesToBuild);
 
-                operation.Complete();
                 _notificationListener.OnNotificationHandled();
 
                 progressReporter.Report("Build finished");
@@ -84,11 +81,6 @@ internal class LanguageServerBuilder
             {
                 _logger.LogCritical(ex, "Failed to handle build request");
                 _notificationListener.OnException(ex);
-                Telemetry.TrackException(ex);
-            }
-            finally
-            {
-                Telemetry.SetIsRealTimeBuild(false);
             }
         }
     }

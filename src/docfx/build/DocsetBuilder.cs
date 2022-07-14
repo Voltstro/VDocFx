@@ -269,7 +269,6 @@ internal class DocsetBuilder
     {
         var contentType = _documentProvider.GetContentType(file);
 
-        Telemetry.TrackBuildFileTypeCount(file, contentType, _documentProvider.GetMime(file));
         contentValidator.ValidateManifest(file);
 
         switch (contentType)

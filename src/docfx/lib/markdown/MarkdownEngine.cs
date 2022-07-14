@@ -186,7 +186,6 @@ internal class MarkdownEngine
             .UseNestedColumn(_markdownContext)
             .UseTripleColon(_markdownContext)
             .UseNoloc()
-            .UseTelemetry(_documentProvider)
             .UseMonikerZone(ParseMonikerRange)
 
             // Extensions before this line sees inclusion AST twice:

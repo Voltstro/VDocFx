@@ -39,8 +39,6 @@ internal class ErrorWriter : ErrorBuilder, IDisposable
             _ => 0,
         };
 
-        Telemetry.TrackErrorCount(error);
-
         if (_output != null)
         {
             lock (_outputLock)

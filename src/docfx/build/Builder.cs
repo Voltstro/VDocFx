@@ -75,7 +75,6 @@ internal class Builder
 
         // load and trace entry repository
         var repository = Repository.Create(_package.BasePath);
-        Telemetry.SetRepository(repository?.Url, repository?.Branch);
 
         var docsets = ConfigLoader.FindDocsets(_errors, _package, _options, repository);
         if (docsets.Length == 0)
