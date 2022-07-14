@@ -201,12 +201,12 @@ internal class DocsetBuilder
             MemoryCache.Clear();
 
             var basePath = string.Empty;
-            if (!string.IsNullOrWhiteSpace(_buildOptions.OutputPath))
+            if (!string.IsNullOrWhiteSpace(_config.BasePath.Value))
             {
-                basePath = $"{_buildOptions.OutputPath}";
+                basePath = $"{_config.BasePath}/";
             }
 
-            var extraShitOutput = new Output($"{basePath}{_config.BasePath}", _input, _config.DryRun);
+            var extraShitOutput = new Output($"{_buildOptions.OutputPath}/{_config.BasePath}", _input, _config.DryRun);
             Parallel.Invoke(
                 () => _templateEngine.CopyAssetsToOutput(extraShitOutput, _config.SelfContained),
                 () => output.WriteJson($"{basePath}.xrefmap.json", xrefMapModel),
