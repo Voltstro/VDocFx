@@ -37,6 +37,12 @@ internal class Config : PreloadConfig
     public string[] Files { get; init; } = DefaultInclude;
 
     /// <summary>
+    /// Other additional files to include
+    /// </summary>
+    [JsonConverter(typeof(OneOrManyConverter))]
+    public string[] AdditionalFiles { get; init; } = Array.Empty<string>();
+
+    /// <summary>
     /// Gets the file glob patterns excluded from this docset.
     /// </summary>
     [JsonConverter(typeof(OneOrManyConverter))]

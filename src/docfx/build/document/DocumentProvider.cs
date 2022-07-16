@@ -277,6 +277,12 @@ internal class DocumentProvider
     {
         (path, _) = _buildScope.MapPath(path);
 
+        // TODO: We need to get rid of start path
+        if (path.StartsWithPath(new PathString("../"), out var fixedPath))
+        {
+            path = fixedPath;
+        }
+
         // the latter rule takes precedence of the former rule
         foreach (var (source, dest) in _routes)
         {

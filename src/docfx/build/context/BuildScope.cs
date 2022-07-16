@@ -31,8 +31,8 @@ internal class BuildScope
     {
         _config = config;
         _buildOptions = buildOptions;
-        _globs = CreateGlobs(config);
         _input = input;
+        _globs = CreateGlobs(config);
         _resourceGlobs = CreateResourceGlob(config);
         _configReferences = config.Extend.Concat(config.GetFileReferences()).Select(path => PathUtility.Normalize(path.Value))
             .ToHashSet(PathUtility.PathComparer);
@@ -149,6 +149,9 @@ internal class BuildScope
             var defaultFiles = _input.ListFilesRecursive(FileOrigin.Main);
             allFiles.UnionWith(defaultFiles);
 
+            var additonalFiles = _input.ListAdditionalFilesFromMain();
+            allFiles.UnionWith(additonalFiles);
+
             if (_buildOptions.IsLocalizedBuild)
             {
                 var fileNames = defaultFiles.Select(file => file.Path).ToHashSet();
@@ -188,24 +191,29 @@ internal class BuildScope
         }
     }
 
-    private static (Func<string, bool>, FileMappingConfig)[] CreateGlobs(Config config)
+    private (Func<string, bool>, FileMappingConfig)[] CreateGlobs(Config config)
     {
         if (config.Content.Length == 0 && config.Resource.Length == 0)
         {
-            var glob = GlobUtility.CreateGlobMatcher(config.Files, config.Exclude.Concat(Config.DefaultExclude).ToArray());
+            string path = _input.GetMainPath();
+            var glob = GlobUtility.CreateGlobMatcher(config.Files, config.Exclude.Concat(Config.DefaultExclude).ToArray(), path);
             return new[] { (glob, new FileMappingConfig()) };
         }
 
+        throw new NotSupportedException();
+
         // Support v2 src/dest config per file group
+        /*
         return (from mapping in config.Content.Concat(config.Resource)
                 let glob = GlobUtility.CreateGlobMatcher(
                     mapping.Files, mapping.Exclude.Concat(Config.DefaultExclude).ToArray())
                 select (glob, mapping)).ToArray();
+                */
     }
 
-    private static Func<string, bool>[] CreateResourceGlob(Config config)
+    private Func<string, bool>[] CreateResourceGlob(Config config)
     {
         return (from mapping in config.Resource
-                select GlobUtility.CreateGlobMatcher(mapping.Files, mapping.Exclude.Concat(Config.DefaultExclude).ToArray())).ToArray();
+                select GlobUtility.CreateGlobMatcher(mapping.Files, mapping.Exclude.Concat(Config.DefaultExclude).ToArray(), _input.GetMainPath())).ToArray();
     }
 }

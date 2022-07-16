@@ -2,7 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text.RegularExpressions;
-using GlobExpressions;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 namespace Microsoft.Docs.Build;
 
@@ -17,37 +18,23 @@ internal static class GlobUtility
         return path => !IsFileStartingWithDot(path) && glob(path);
     }
 
-    public static Func<string, bool> CreateGlobMatcher(string[] includePatterns, string[]? excludePatterns = null)
+    public static Func<string, bool> CreateGlobMatcher(string[] includePatterns, string[]? excludePatterns = null, string? directory = null)
     {
-        var includeGlobs = Array.ConvertAll(includePatterns, CreateGlob);
-        var excludeGlobs = Array.ConvertAll(excludePatterns ?? Array.Empty<string>(), CreateGlob);
+        var matcher = new Matcher(StringComparison.InvariantCultureIgnoreCase);
+        matcher.AddIncludePatterns(includePatterns);
 
-        return IsMatch;
-
-        bool IsMatch(string path)
+        if (excludePatterns != null)
         {
-            if (IsFileStartingWithDot(path))
-            {
-                return false;
-            }
-
-            foreach (var exclude in excludeGlobs)
-            {
-                if (exclude != null && exclude(path))
-                {
-                    return false;
-                }
-            }
-
-            foreach (var include in includeGlobs)
-            {
-                if (include != null && include(path))
-                {
-                    return true;
-                }
-            }
-            return false;
+            matcher.AddExcludePatterns(excludePatterns);
         }
+
+        if (directory == null)
+        {
+            return new Glob(matcher).IsMatch;
+        }
+
+        var result = matcher.Execute(new DirectoryInfoWrapper(new DirectoryInfo(directory)));
+        return new Glob(result).IsMatch;
     }
 
     public static bool IsGlobString(string str)
@@ -64,9 +51,11 @@ internal static class GlobUtility
 
         try
         {
-            var options = PathUtility.IsCaseSensitive ? GlobOptions.None : GlobOptions.CaseInsensitive;
+            var options = PathUtility.IsCaseSensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+            var matcher = new Matcher(options);
+            matcher.AddInclude(pattern);
 
-            return new Glob(pattern, options | GlobOptions.MatchFullPath | GlobOptions.Compiled).IsMatch;
+            return new Glob(matcher).IsMatch;
         }
         catch (Exception ex)
         {
@@ -88,6 +77,39 @@ internal static class GlobUtility
         pattern = Regex.Replace(pattern, @"^\*{2}\.", "**/*.");
         pattern = Regex.Replace(pattern, @"\*\*\/\*$", "**");
         return pattern.Replace("/**.", "/**/*.").Replace("/**/**/", "/**/");
+    }
+
+    private class Glob
+    {
+        private readonly Matcher? _matcher;
+        private readonly PatternMatchingResult? _result;
+
+        public Glob(Matcher matcher)
+        {
+            _matcher = matcher;
+        }
+
+        public Glob(PatternMatchingResult result)
+        {
+            _result = result;
+        }
+
+        public bool IsMatch(string path)
+        {
+            var match = false;
+            if (_matcher != null)
+            {
+                match = _matcher.Match(path).HasMatches;
+            }
+            else
+            {
+                if (_result!.Files.FirstOrDefault(x => x.Path == path).Path != null)
+                {
+                    match = true;
+                }
+            }
+            return match;
+        }
     }
 
     /// <summary>

@@ -199,6 +199,14 @@ internal class Input
     }
 
     /// <summary>
+    /// Gets the main package's path
+    /// </summary>
+    public PathString GetMainPath()
+    {
+        return _mainPackage.BasePath;
+    }
+
+    /// <summary>
     /// List all the file path.
     /// </summary>
     public FilePath[] ListFilesRecursive(FileOrigin origin, PathString? dependencyName = null)
@@ -225,6 +233,16 @@ internal class Input
             default:
                 throw new NotSupportedException($"{nameof(ListFilesRecursive)}: {origin}");
         }
+    }
+
+    public IReadOnlyList<FilePath> ListAdditionalFilesFromMain()
+    {
+        var paths = new ListBuilder<FilePath>();
+        Parallel.ForEach(_config.AdditionalFiles, file =>
+        {
+            paths.Add(new FilePath(file));
+        });
+        return paths.AsList();
     }
 
     public void AddGeneratedContent(FilePath file, JToken content, string? yamlMime)

@@ -19,7 +19,7 @@ internal class BuildOptions
     public Repository? Repository { get; }
 
     /// <summary>
-    /// Gets the lower-case culture name computed from <see cref="CommandLineOptions.Locale" or <see cref="Config.DefaultLocale"/>/>
+    /// Gets the lower-case culture name computed from <see cref="CommandLineOptions.Locale"/> or <see cref="Config.DefaultLocale"/>
     /// </summary>
     public string Locale { get; }
 
