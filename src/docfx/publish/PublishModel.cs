@@ -13,6 +13,8 @@ internal class PublishModel
 
     public string? Product { get; init; }
 
+    public string? HostName { get; init; }
+
     public string? BasePath { get; init; }
 
     public string? ThemeBranch { get; init; }

@@ -3,6 +3,7 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Docs.Build.sitemap;
 
 namespace Microsoft.Docs.Build;
 
@@ -194,6 +195,7 @@ internal class DocsetBuilder
             // TODO: explicitly state that ToXrefMapModel produces errors
             var xrefMapModel = _xrefResolver.ToXrefMapModel();
             var (publishModel, fileManifests) = publishModelBuilder.Build(filesToBuild);
+            var siteMapBuilder = new SiteMapBuilder(publishModel, _documentProvider);
 
             // TODO: decouple files and dependencies from legacy.
             var dependencyMap = _dependencyMapBuilder.Build();
@@ -212,7 +214,8 @@ internal class DocsetBuilder
                 () => output.WriteJson($"{basePath}.xrefmap.json", xrefMapModel),
                 () => output.WriteJson($"{basePath}.publish.json", publishModel),
                 () => output.WriteJson($"{basePath}.dependencymap.json", dependencyMap.ToDependencyMapModel()),
-                () => output.WriteJson($"{basePath}.links.json", _fileLinkMapBuilder.Build(publishModel)));
+                () => output.WriteJson($"{basePath}.links.json", _fileLinkMapBuilder.Build(publishModel)),
+                () => output.WriteXDocument($"{basePath}sitemap.xml", siteMapBuilder.Build()));
 
             new OpsPostProcessor(_config, _errors, _buildOptions, _opsAccessor, _jsonSchemaTransformer.GetValidateExternalXrefs()).Run();
         }

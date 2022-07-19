@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Microsoft.Docs.Build;
 
@@ -29,6 +30,16 @@ internal class Output
 
         using var stream = new FileStream(EnsureDestinationPath(destRelativePath), FileMode.Create);
         JsonUtility.SerializeStable(stream, graph);
+    }
+
+    /// <summary>
+    /// Writes an <see cref="XDocument"/>
+    /// </summary>
+    public void WriteXDocument(string destRelativePath, XDocument document)
+    {
+        EnsureNoDryRun();
+
+        document.Save(EnsureDestinationPath(destRelativePath));
     }
 
     /// <summary>

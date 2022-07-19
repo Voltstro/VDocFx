@@ -88,6 +88,7 @@ internal class PublishModelBuilder
         {
             Name = _config.Name,
             Product = _config.Product,
+            HostName = _config.HostName,
             BasePath = _config.BasePath.ValueWithLeadingSlash,
             ThemeBranch = _config.Template.IsMainOrMaster ? null : _config.Template.Branch,
             Files = items,

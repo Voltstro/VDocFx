@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Menees.Analyzers.2017" Version="2.0.3" PrivateAssets="all" />
     <!-- This package was transitively referenced by OmniSharp server, stop propagating it to other projects by explicitly marking it as private assets -->
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.2.32" PrivateAssets="all" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.107" PrivateAssets="all" />
