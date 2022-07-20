@@ -36,7 +36,7 @@ internal sealed class JintJsEngine : JavaScriptEngine
             jsArg.AsObject().Set("__global", _global);
         }
 
-        return ToJToken(method.Invoke(jsArg));
+        return ToJToken(_engine.Invoke(method, jsArg));
     }
 
     public override void Dispose()
@@ -68,7 +68,7 @@ internal sealed class JintJsEngine : JavaScriptEngine
         var require = new ClrFunctionInstance(engine, "require", Require);
 
         var func = engine.Evaluate(script, parserOptions);
-        func.Invoke(module, exports, dirname, require, MakeObject());
+        _engine.Invoke(func, module, exports, dirname, require, MakeObject());
         return _modules[scriptPath] = module.Get("exports");
 
         JsValue Require(JsValue self, JsValue[] arguments)

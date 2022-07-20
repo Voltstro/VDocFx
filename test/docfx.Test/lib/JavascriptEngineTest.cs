@@ -11,9 +11,7 @@ namespace Microsoft.Docs.Build;
 
 public class JavascriptEngineTest
 {
-    private readonly JavaScriptEngine[] _engines = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-        ? new JavaScriptEngine[] { new JintJsEngine(new LocalPackage("data/javascript")), new ChakraCoreJsEngine(new LocalPackage("data/javascript")) }
-        : new JavaScriptEngine[] { new JintJsEngine(new LocalPackage("data/javascript")) };
+    private readonly JavaScriptEngine[] _engines = { new JintJsEngine(new LocalPackage("data/javascript")) };
 
     [Theory]
     [InlineData("{'scalar':'hello','tags':[1,2.123],'page':{'value':3}}", "{'scalar':'hello','tags':[1,2.123],'page':{'value':3}}")]
@@ -51,6 +49,7 @@ public class JavascriptEngineTest
         }
     }
 
+    /*
     [SkippableFact]
     public void ReleaseMemoryOnDispose()
     {
@@ -71,4 +70,5 @@ public class JavascriptEngineTest
         var afterDispose = Process.GetCurrentProcess().WorkingSet64;
         Assert.True(after - afterDispose >= size - epsilon, $"before {before}, after {after}, after dispose {afterDispose}");
     }
+    */
 }
