@@ -39,7 +39,7 @@ internal class SiteMapBuilder
                 continue;
             }
 
-            var fullUrl = $"{_publishModel.HostName}{publishItem.Url}";
+            var fullUrl = $"https://{_publishModel.HostName}{publishItem.Url}";
 
             var urlElement = new XElement(
                 xmlns + "url",
