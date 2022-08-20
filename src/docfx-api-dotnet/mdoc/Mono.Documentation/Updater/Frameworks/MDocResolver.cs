@@ -10,10 +10,10 @@ namespace Mono.Documentation.Updater.Frameworks
 {
     /// <summary>resolver to handle assembly lookups</summary>
     /// <remarks><para>This resolver handles two scenarios. First is UWP
-    /// references to 'mscorlib' (which simply picks up the 4.5 version, 
-    /// or whatever you have installed). And second, it tries its 
-    /// best to match on version. If it can't find the exact version, it 
-    /// will try to find the next highest version, and if that fails, 
+    /// references to 'mscorlib' (which simply picks up the 4.5 version,
+    /// or whatever you have installed). And second, it tries its
+    /// best to match on version. If it can't find the exact version, it
+    /// will try to find the next highest version, and if that fails,
     /// a lower version if available.</para>
     /// <para>Please note that you will need to provide a reference
     /// to the UWP framework directory, if you are trying to document
@@ -336,7 +336,7 @@ namespace Mono.Documentation.Updater.Frameworks
     }
 
     /// <summary>
-    /// Sourced from Mono.Cecil's BaseAssemblyResolver: <see href="https://github.com/jbevain/cecil/blob/master/Mono.Cecil/BaseAssemblyResolver.cs" /> 
+    /// Sourced from Mono.Cecil's BaseAssemblyResolver: <see href="https://github.com/jbevain/cecil/blob/master/Mono.Cecil/BaseAssemblyResolver.cs" />
     /// </summary>
     /// <remarks>
     /// There are two changes made from the original source
@@ -366,11 +366,11 @@ namespace Mono.Documentation.Updater.Frameworks
         {
             return Resolve(name, parameters, emptyStringArray);
         }
-        
+
         internal AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters, IEnumerable<string> filesToIgnore)
         {
             var directories = this.GetSearchDirectories();
-            
+
             var assembly = SearchDirectory(name, directories, parameters, filesToIgnore);
             if (assembly != null)
                 return assembly;
@@ -526,6 +526,12 @@ namespace Mono.Documentation.Updater.Frameworks
                     .Where(Directory.Exists)
                     .ToArray();
             }
+
+            //Custom binaries
+            var profilePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var customBinsPath = Path.GetFullPath($"{profilePath}/Binaries");
+            framework_dirs = framework_dirs.Concat(new[] {customBinsPath}).ToArray();
+
             return framework_dirs;
         }
 

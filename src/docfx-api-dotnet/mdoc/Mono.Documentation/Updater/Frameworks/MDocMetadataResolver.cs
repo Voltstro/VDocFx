@@ -17,34 +17,35 @@ namespace Mono.Documentation.Updater.Frameworks
 
             if (scope == null)
                 return null;
-            
+
             CachedResolver assembly_resolver = this.AssemblyResolver as CachedResolver;
             parameters.AssemblyResolver = assembly_resolver;
             parameters.MetadataResolver = this;
 
-            try {
-
-            switch (scope.MetadataScopeType)
+            try
             {
-                case MetadataScopeType.AssemblyNameReference:
-                    var assembly = assembly_resolver.ResolveCore ((AssemblyNameReference)scope, parameters, type);
-                    if (assembly == null)
-                        return null;
 
-                    return GetType (assembly.MainModule, type);
-                case MetadataScopeType.ModuleDefinition:
-                    return GetType ((ModuleDefinition)scope, type);
-                case MetadataScopeType.ModuleReference:
-                    var modules = type.Module.Assembly.Modules;
-                    var module_ref = (ModuleReference)scope;
-                    for (int i = 0; i < modules.Count; i++)
-                    {
-                        var netmodule = modules[i];
-                        if (netmodule.Name == module_ref.Name)
-                            return GetType (netmodule, type);
-                    }
-                    break;
-            }
+                switch (scope.MetadataScopeType)
+                {
+                    case MetadataScopeType.AssemblyNameReference:
+                        var assembly = assembly_resolver.ResolveCore ((AssemblyNameReference)scope, parameters, type);
+                        if (assembly == null)
+                            return null;
+
+                        return GetType (assembly.MainModule, type);
+                    case MetadataScopeType.ModuleDefinition:
+                        return GetType ((ModuleDefinition)scope, type);
+                    case MetadataScopeType.ModuleReference:
+                        var modules = type.Module.Assembly.Modules;
+                        var module_ref = (ModuleReference)scope;
+                        for (int i = 0; i < modules.Count; i++)
+                        {
+                            var netmodule = modules[i];
+                            if (netmodule.Name == module_ref.Name)
+                                return GetType (netmodule, type);
+                        }
+                        break;
+                }
             }
             catch(AssemblyResolutionException are)
             {
