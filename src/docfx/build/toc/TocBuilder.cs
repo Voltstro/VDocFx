@@ -48,9 +48,9 @@ internal class TocBuilder
         _contentValidator.ValidateTocDeprecated(file);
 
         var metadata = _metadataProvider.GetMetadata(errors, file);
-        var transformedMetadata = _metadataValidator.ValidateAndTransformMetadata(errors, metadata.RawJObject, file);
+        _metadataValidator.ValidateMetadata(errors, metadata.RawJObject, file);
 
-        var tocMetadata = JsonUtility.ToObject<TocMetadata>(errors, transformedMetadata);
+        var tocMetadata = JsonUtility.ToObject<TocMetadata>(errors, metadata.RawJObject);
 
         var path = _documentProvider.GetSitePath(file);
 
@@ -69,15 +69,27 @@ internal class TocBuilder
 
         if (!errors.FileHasError(file) && !_config.DryRun)
         {
-            var json = JsonUtility.ToJObject(model);
-            var output = _templateEngine.RunJavaScript("toc.json.js", json);
-            _output.WriteJson(Path.ChangeExtension(outputPath, ".json"), output);
-
-            if (_config.OutputType == OutputType.Html && _documentProvider.GetRenderType(file) == RenderType.Content)
+            if (_config.OutputType == OutputType.Json)
             {
-                var viewModel = _templateEngine.RunJavaScript($"toc.html.js", json);
-                var html = _templateEngine.RunMustache(errors, $"toc.html", viewModel);
-                _output.WriteText(outputPath, html);
+                _output.WriteJson(outputPath, JsonUtility.ToJObject(model));
+            }
+            else if (_config.OutputType == OutputType.PageJson)
+            {
+                var output = _templateEngine.RunJavaScript("toc.json.js", JsonUtility.ToJObject(model));
+                _output.WriteJson(outputPath, output);
+            }
+            else
+            {
+                if (_documentProvider.GetRenderType(file) == RenderType.Content)
+                {
+                    var viewModel = _templateEngine.RunJavaScript($"toc.html.js", JsonUtility.ToJObject(model));
+                    var html = _templateEngine.RunMustache(errors, $"toc.html", viewModel);
+                    _output.WriteText(outputPath, html);
+                }
+
+                // Just for current PDF build. toc.json is used for generate PDF outline
+                var output = _templateEngine.RunJavaScript("toc.json.js", JsonUtility.ToJObject(model));
+                _output.WriteJson(Path.ChangeExtension(outputPath, ".json"), output);
             }
         }
 

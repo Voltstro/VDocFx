@@ -17,6 +17,7 @@ internal class RedirectionProvider
     private readonly Package _docsetPackage;
     private readonly Watch<(Dictionary<FilePath, string> urls, HashSet<PathString> paths, RedirectionItem[] items)> _redirects;
     private readonly Watch<(Dictionary<FilePath, FilePath> renames, Dictionary<FilePath, (FilePath, SourceInfo?)> redirects)> _history;
+    private readonly HashSet<PathString> _autoScannedRedirectionFiles;
 
     public IEnumerable<FilePath> Files => _redirects.Value.urls.Keys;
 
@@ -41,6 +42,7 @@ internal class RedirectionProvider
 
         _redirects = new(LoadRedirections);
         _history = new(LoadHistory);
+        _autoScannedRedirectionFiles = AutoScanRedirectionFiles();
     }
 
     public bool TryGetValue(PathString file, [NotNullWhen(true)] out FilePath? actualPath)
@@ -95,14 +97,14 @@ internal class RedirectionProvider
         using (Progress.Start("Loading redirections"))
         {
             var redirections = LoadRedirectionModel();
-            var redirectUrls = GetRedirectUrls(redirections, _config.HostName);
+            var redirectUrls = GetRedirectUrls(redirections);
             var redirectPaths = redirectUrls.Keys.Select(x => x.Path).ToHashSet();
 
             return (redirectUrls, redirectPaths, redirections);
         }
     }
 
-    private Dictionary<FilePath, string> GetRedirectUrls(RedirectionItem[] redirections, string hostName)
+    private Dictionary<FilePath, string> GetRedirectUrls(RedirectionItem[] redirections)
     {
         var redirectUrls = new Dictionary<FilePath, string>();
 
@@ -127,23 +129,21 @@ internal class RedirectionProvider
             var monikers = item.Monikers is null ? default : _monikerProvider.Validate(_errors, item.Monikers);
             var filePath = FilePath.Redirection(path, monikers);
 
-            if (item.RedirectDocumentId)
+            switch (UrlUtility.GetLinkType(absoluteRedirectUrl))
             {
-                switch (UrlUtility.GetLinkType(absoluteRedirectUrl))
-                {
-                    case LinkType.RelativePath:
-                        var siteUrl = _documentProvider.GetSiteUrl(filePath);
-                        absoluteRedirectUrl = PathUtility.Normalize(Path.Combine(Path.GetDirectoryName(siteUrl) ?? "", absoluteRedirectUrl));
-                        break;
-                    case LinkType.AbsolutePath:
-                        break;
-                    case LinkType.External:
-                        absoluteRedirectUrl = UrlUtility.RemoveLeadingHostName(absoluteRedirectUrl, hostName, removeLocale: true);
-                        break;
-                    default:
-                        _errors.Add(Errors.Redirection.RedirectUrlInvalid(path, redirectUrl));
-                        break;
-                }
+                case LinkType.RelativePath:
+                    var siteUrl = _documentProvider.GetSiteUrl(filePath);
+                    absoluteRedirectUrl = PathUtility.Normalize(Path.Combine(Path.GetDirectoryName(siteUrl) ?? "", absoluteRedirectUrl));
+                    break;
+                case LinkType.AbsolutePath:
+                    break;
+                case LinkType.External:
+                    absoluteRedirectUrl = UrlUtility.RemoveLeadingHostName(absoluteRedirectUrl, _config.HostName, removeLocale: true);
+                    absoluteRedirectUrl = UrlUtility.RemoveLeadingHostName(absoluteRedirectUrl, _config.AlternativeHostName, removeLocale: true);
+                    break;
+                default:
+                    _errors.Add(Errors.Redirection.RedirectUrlInvalid(path, redirectUrl));
+                    break;
             }
 
             if (!redirectUrls.TryAdd(filePath, absoluteRedirectUrl))
@@ -160,16 +160,11 @@ internal class RedirectionProvider
 
         foreach (var fullPath in ProbeRedirectionFiles())
         {
+            _autoScannedRedirectionFiles.Remove(fullPath);
             if (_docsetPackage.Exists(fullPath))
             {
                 GenerateRedirectionRules(fullPath, results);
-                break;
             }
-        }
-
-        foreach (var fullPath in ProbeSubRedirectionFiles())
-        {
-            GenerateRedirectionRules(fullPath, results);
         }
 
         return results.OrderBy(item => item.RedirectUrl.Source).ToArray();
@@ -258,33 +253,23 @@ internal class RedirectionProvider
 
         if (_buildOptions.Repository != null)
         {
-            yield return new PathString(Path.Combine(_buildOptions.Repository.Path, ".openpublishing.redirection.json"));
+            var files = Directory.EnumerateFiles(_buildOptions.Repository.Path, "*.openpublishing.redirection*.json", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                yield return new PathString(file);
+            }
         }
     }
 
-    private IEnumerable<PathString> ProbeSubRedirectionFiles()
+    private HashSet<PathString> AutoScanRedirectionFiles()
     {
-        if (_buildOptions.Repository != null)
+        var redirectionFilesSet = new HashSet<PathString>();
+        if (_buildOptions.Repository is not null)
         {
-            foreach (var item in _config.RedirectionFiles)
-            {
-                if (item.Equals(".openpublishing.redirection.json", PathUtility.PathComparison))
-                {
-                    continue;
-                }
-
-                var fullPath = Path.Combine(_buildOptions.Repository.Path, item);
-
-                if (!File.Exists(fullPath))
-                {
-                    _errors.Add(Errors.Redirection.RedirectionFileNotFound(item));
-                }
-                else
-                {
-                    yield return new PathString(fullPath);
-                }
-            }
+            var files = Directory.EnumerateFiles(_buildOptions.Repository.Path, "*.openpublishing.redirection*.json", SearchOption.AllDirectories);
+            redirectionFilesSet = files.Select(file => new PathString(file)).ToHashSet();
         }
+        return redirectionFilesSet;
     }
 
     private (Dictionary<FilePath, FilePath>, Dictionary<FilePath, (FilePath, SourceInfo?)>) LoadHistory()

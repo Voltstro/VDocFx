@@ -18,9 +18,13 @@ public static class DocfxTest
     private static readonly AsyncLocal<IReadOnlyDictionary<string, string>> s_repos = new();
     private static readonly AsyncLocal<IReadOnlyDictionary<string, string>> s_remoteFiles = new();
     private static readonly AsyncLocal<string> s_appDataPath = new();
+    private static readonly AsyncLocal<DocsEnvironment?> s_buildEnvironment = new();
+    private static readonly AsyncLocal<bool> s_useGitHubToken = new();
 
     static DocfxTest()
     {
+        TestQuirks.BuildEnvironment = () => s_buildEnvironment.Value;
+
         TestQuirks.AppDataPath = () => s_appDataPath.Value;
 
         TestQuirks.GitRemoteProxy = remote =>
@@ -39,6 +43,22 @@ public static class DocfxTest
             if (mockedRemoteFiles != null && mockedRemoteFiles.TryGetValue(remote, out var mockedContent))
             {
                 return mockedContent;
+            }
+            return null;
+        };
+
+        TestQuirks.OpsGetAccessTokenProxy = url =>
+        {
+            if (url == null)
+            {
+                return s_useGitHubToken.Value
+                    ? Environment.GetEnvironmentVariable("DOCS_GITHUB_TOKEN") ?? string.Empty
+                    : string.Empty;
+            }
+            var mockedRemoteFiles = s_remoteFiles.Value;
+            if (mockedRemoteFiles != null && mockedRemoteFiles.Values.Contains(url))
+            {
+                return string.Empty;
             }
             return null;
         };
@@ -80,9 +100,11 @@ public static class DocfxTest
 
             try
             {
+                s_buildEnvironment.Value = Enum.TryParse(spec.BuildEnvironment, out DocsEnvironment env) ? env : DocsEnvironment.PPE;
                 s_repos.Value = repos;
                 s_remoteFiles.Value = spec.Http;
                 s_appDataPath.Value = appDataPath;
+                s_useGitHubToken.Value = spec.Environments.Contains("DOCS_GITHUB_TOKEN");
                 RunCore(docsetPath, outputPath, test, spec, package);
             }
             catch (Exception exception)
@@ -95,6 +117,7 @@ public static class DocfxTest
             }
             finally
             {
+                s_buildEnvironment.Value = null;
                 s_repos.Value = null;
                 s_remoteFiles.Value = null;
                 s_appDataPath.Value = null;
@@ -170,6 +193,10 @@ public static class DocfxTest
 
             TestUtility.CreateFiles(cachePath, spec.Cache, variables);
             TestUtility.CreateFiles(statePath, spec.State, variables);
+            if (spec.Repos.Count == 0 && !GitUtility.IsGitRepository(docsetPath))
+            {
+                GitUtility.Init(docsetPath);
+            }
             if (package is LocalPackage)
             {
                 TestUtility.CreateFiles(docsetPath, spec.Inputs, variables);

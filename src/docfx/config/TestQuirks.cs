@@ -7,7 +7,11 @@ internal static class TestQuirks
 {
     public static Func<string>? AppDataPath { get; set; }
 
+    public static Func<DocsEnvironment?>? BuildEnvironment { get; set; }
+
     public static Func<string, string>? GitRemoteProxy { get; set; }
+
+    public static Func<string?, string?>? OpsGetAccessTokenProxy { get; set; }
 
     public static Func<string, string?>? HttpProxy { get; set; }
 

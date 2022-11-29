@@ -91,7 +91,7 @@ internal static class ConfigLoader
             () => LocalizationUtility.GetFallbackDocsetPath(docsetPath, repository, preloadConfig.FallbackRepository, packageResolver!));
         var fileResolver = new FileResolver(package, fallbackDocsetPath, credentialHandler, configAdapter, fetchOptions);
 
-        packageResolver = new PackageResolver(errors, docsetPath, preloadConfig, fetchOptions, fileResolver, repository);
+        packageResolver = new PackageResolver(errors, docsetPath, preloadConfig, fetchOptions, fileResolver, repository, opsAccessor);
 
         var buildOptions = new BuildOptions(docsetPath, fallbackDocsetPath.Value, outputPath, repository, preloadConfig, package);
         var extendConfig = DownloadExtendConfig(
@@ -101,7 +101,10 @@ internal static class ConfigLoader
         var configObject = new JObject();
         JsonUtility.Merge(unionProperties, configObject, envConfig, globalConfig, extendConfig, opsConfig, docfxConfig, cliConfig);
         var config = JsonUtility.ToObject<Config>(errors, configObject);
-
+        if (config.ValidateTemplateBranch)
+        {
+            ValidateTemplateBranch(config.Template);
+        }
         return (config, buildOptions, packageResolver, fileResolver, opsAccessor);
     }
 
@@ -216,7 +219,6 @@ internal static class ConfigLoader
             $"&xref_endpoint={WebUtility.UrlEncode(xrefEndpoint)}" +
             $"&xref_query_tags={WebUtility.UrlEncode(xrefQueryTags is null ? null : string.Join(',', xrefQueryTags))}";
 
-        Console.WriteLine($"publish_repository_url: {WebUtility.UrlEncode(publishRepositoryUrl)}, repositoryUrl: {WebUtility.UrlEncode(publishRepositoryUrl)}");
         foreach (var extend in config.Extend)
         {
             var extendWithQuery = extend;
@@ -260,5 +262,13 @@ internal static class ConfigLoader
         }
 
         return null;
+    }
+
+    private static void ValidateTemplateBranch(PackagePath template)
+    {
+        if (!template.IsMainOrMasterOrDefault)
+        {
+            throw Errors.Config.TemplateBranchInvalid(template.Branch).ToException();
+        }
     }
 }

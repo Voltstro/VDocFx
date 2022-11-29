@@ -233,7 +233,7 @@ internal class Config : PreloadConfig
     /// <example>
     /// - "a" -> ["https://*"]: Matches all domains using https for `a` tag
     /// - "a" -> ["http://*"]: Matches all domains using http or https (http implies https) for `a` tag
-    /// - "img" -> ["https://docs.microsoft.com"]: Matches this specific domain using https
+    /// - "img" -> ["https://learn.microsoft.com"]: Matches this specific domain using https
     /// </example>
     public Dictionary<string, TrustedDomains> TrustedDomains { get; init; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -361,9 +361,11 @@ internal class Config : PreloadConfig
 
     public HashSet<PathString> SplitTOC { get; init; } = new();
 
-    public HashSet<string> RedirectionFiles { get; init; } = new();
-
     public string AlternativeHostName { get; init; } = string.Empty;
+
+    public bool IsCanonicalUrlWithMoniker { get; init; }
+
+    public bool ValidateTemplateBranch { get; init; }
 
     public IEnumerable<SourceInfo<string>> GetFileReferences()
     {

@@ -68,7 +68,6 @@ internal static class OpsConfigLoader
         result["editRepositoryBranch"] = opsConfig.GitRepositoryBranchOpenToPublicContributors;
         result["fallbackRepository"] = dependencies.FirstOrDefault(
             dep => dep.name.Equals("_repo.en-us", StringComparison.OrdinalIgnoreCase)).obj;
-        result["redirectionFiles"] = JToken.FromObject(opsConfig.RedirectionFiles);
 
         var docsetConfig = opsConfig.DocsetsToPublish.FirstOrDefault(
             config => config.BuildSourceFolder.FolderEquals(buildSourceFolder));
@@ -226,6 +225,10 @@ internal static class OpsConfigLoader
             if (!string.IsNullOrEmpty(config.TopLevelTOC))
             {
                 item["topLevelToc"] = baseDir.GetRelativePath(new PathString(config.TopLevelTOC));
+            }
+            if (!string.IsNullOrEmpty(config.OriginalReferenceTOC))
+            {
+                item["originalReferenceToc"] = baseDir.GetRelativePath(new PathString(config.OriginalReferenceTOC));
             }
 
             joinTocConfig.Add(item);

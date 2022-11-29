@@ -63,18 +63,18 @@ inputs:
   docfx.yml:
   redirections.yml: |
     redirections:
-      a.md: https://docs.microsoft.com/docfx/a
+      a.md: https://learn.microsoft.com/docfx/a
       b.md: a
 outputs:
 ---
 # redirect to can start with https and hostname
 inputs:
   docfx.yml: |
-    hostName: docs.microsoft.com
+    hostName: learn.microsoft.com
   b.md:
   redirections.yml: |
     renames:
-      a.md: https://docs.microsoft.com/b
+      a.md: https://learn.microsoft.com/b
 outputs:
   b.json: |
    {"document_id": "65b4ee15-e7e4-88ee-72ec-7be7d0bcd895", "document_version_independent_id": "65b4ee15-e7e4-88ee-72ec-7be7d0bcd895"}
@@ -91,8 +91,8 @@ inputs:
 outputs:
   .publish.json: |
     {"files":[
-      {"url":"/a", "document_id":"65b4ee15-e7e4-88ee-72ec-7be7d0bcd895", "canonical_url": "https://docs.com/en-us/a", "document_version_independent_id": "65b4ee15-e7e4-88ee-72ec-7be7d0bcd895"}, 
-      {"url":"/b", "document_id":"65b4ee15-e7e4-88ee-72ec-7be7d0bcd895"}
+      {"url":"/b", "document_id":"65b4ee15-e7e4-88ee-72ec-7be7d0bcd895"},
+      {"url":"/a", "document_id":"65b4ee15-e7e4-88ee-72ec-7be7d0bcd895", "canonical_url": "https://docs.com/en-us/a", "document_version_independent_id": "65b4ee15-e7e4-88ee-72ec-7be7d0bcd895"}
     ]}
   b.json: |
    {"document_id": "65b4ee15-e7e4-88ee-72ec-7be7d0bcd895", "document_version_independent_id": "65b4ee15-e7e4-88ee-72ec-7be7d0bcd895"}
@@ -113,9 +113,9 @@ outputs:
   .publish.json: |
     {
         "files": [
+            { "url": "/docs/path1" },
             { "url": "/a" },
-            { "url": "/b" },
-            { "url": "/docs/path1" }
+            { "url": "/b" }
         ]
     }
   docs/path1.json: |
@@ -192,15 +192,15 @@ outputs:
     {
       "files": [
           {
-              "url": "/partner-center-sdk/agreement-metadata",              
-              "locale": "en-us",
-              "redirect_url": "/partner-center-sdk/agreement-metadata-resources"
-          },
-          {
               "url": "/partner-center-sdk/agreement-metadata-resources",
               "path": "partner-center-sdk/agreement-metadata-resources.json",
               "source_path": "agreement-metadata-resources.md",
               "locale": "en-us"
+          },
+          {
+              "url": "/partner-center-sdk/agreement-metadata",              
+              "locale": "en-us",
+              "redirect_url": "/partner-center-sdk/agreement-metadata-resources"
           }
       ]
     }
@@ -777,11 +777,7 @@ repos:
   - files:
       .openpublishing.publish.config.json: |
         {
-          "docsets_to_publish": [{"build_source_folder":"a"}],
-          "redirection_files": [
-            ".openpublishing.redirection.json",
-            "a/b/.openpublishing.redirection.json"
-          ],
+          "docsets_to_publish": [{"build_source_folder":"a"}]
         }
       .openpublishing.redirection.json: |
         {
@@ -807,11 +803,7 @@ repos:
   - files:
       .openpublishing.publish.config.json: |
         {
-          "docsets_to_publish": [{"build_source_folder":"a"}],
-          "redirection_files": [
-            ".openpublishing.redirection.json",
-            "a/b/.openpublishing.redirection.json"
-          ],
+          "docsets_to_publish": [{"build_source_folder":"a"}]
         }
       .openpublishing.redirection.json: |
         {
@@ -825,30 +817,14 @@ outputs:
   a/.publish.json: |
     {
       "files": [
+        {"url": "/aa", "locale": "en-us"},
         {"url": "/a", "locale": "en-us", "redirect_url": "/aa"},
-        {"url": "/b", "locale": "en-us"},
-        {"url": "/aa", "locale": "en-us"}
+        {"url": "/b", "locale": "en-us"}
       ]
     }
   .errors.log: |
     {"message_severity":"warning","code":"redirection-url-conflict","message":"The following files are redirected to '/aa' with redirect_document_id set to true: 'a.md', 'b.md'. Only one file can have its document ID redirected to each redirect_url. Change all but one instance to false in redirection file(s): '../.openpublishing.redirection.json', 'b/.openpublishing.redirection.json'.","file":".openpublishing.redirection.json","line":2,"column":66}
   a/aa.json:
----
-# File not found for a registered redirection file.
-repos:
-  https://github.com/redirection/multiple-redirection-files-file-not-found:
-  - files:
-      .openpublishing.publish.config.json: |
-        {
-          "docsets_to_publish": [{"build_source_folder":"a"}],
-          "redirection_files": [
-            "a/b/.openpublishing.redirection.json"
-          ],
-        }
-      a/docfx.yml:
-outputs:
-  .errors.log: |
-    {"message_severity":"error","code":"redirection-file-not-found","message":"Redirection file 'a/b/.openpublishing.redirection.json' registered in .openpublishing.publish.json is not found in the repo."}
 ---
 # source_path and source_path_from_root exist at the same time
 repos:
@@ -856,10 +832,7 @@ repos:
   - files:
       .openpublishing.publish.config.json: |
         {
-          "docsets_to_publish": [{"build_source_folder":"a"}],
-          "redirection_files": [
-            "a/b/.openpublishing.redirection.json"
-          ],
+          "docsets_to_publish": [{"build_source_folder":"a"}]
         }
       a/docfx.yml:
       a/b/.openpublishing.redirection.json: |
@@ -875,11 +848,7 @@ repos:
   - files:
       .openpublishing.publish.config.json: |
         {
-          "docsets_to_publish": [{"build_source_folder":"a"}],
-          "redirection_files": [
-            ".openpublishing.redirection.json",
-            "a/b/.openpublishing.redirection.json"
-          ],
+          "docsets_to_publish": [{"build_source_folder":"a"}]
         }
       .openpublishing.redirection.json: |
         {
@@ -901,11 +870,7 @@ repos:
   - files:
       .openpublishing.publish.config.json: |
         {
-          "docsets_to_publish": [{"build_source_folder":"a"}],
-          "redirection_files": [
-            ".openpublishing.redirection.json",
-            "a/b/.openpublishing.redirection.json"
-          ],
+          "docsets_to_publish": [{"build_source_folder":"a"}]
         }
       .openpublishing.redirection.json: |
         {
@@ -959,8 +924,6 @@ repos:
       a/b/.openpublishing.redirection.A.json: |
         {"redirections": [{"source_path_from_root": "/a/c.md", "redirect_url": "/aa"}]}
 outputs:
-  .errors.log: |
-    {"message_severity":"error","code":"redirection-file-not-found","message":"Redirection file 'a/b/.openpublishing.redirection.a.json' registered in .openpublishing.publish.json is not found in the repo."}
   a/.publish.json: |
     {"files": [{"url": "/c", "locale": "en-us", "redirect_url": "/aa"}]}
 ---
@@ -976,3 +939,179 @@ outputs:
   .errors.log: |
     {"message_severity":"warning","code":"path-invalid","message":"Path <invalid>/*invalid.md contains invalid chars '<', '>', '*'."}
     {"message_severity":"warning","code":"missing-attribute","message":"Missing required attribute: '(source_path or source_path_from_root) or redirect_url'."}
+---
+# Remove redirect_url hostname when it is the same as hostname or alternativeHostName in despite of redirect_document_id
+repos:
+  https://docs.com/ops/redirect:
+  - files:
+      redirections.json: |
+        {
+          "redirections": [
+            {
+              "source_path": "original.md",
+              "redirect_url": "https://docs.com/folder/a",
+              "redirect_document_id": "true"
+            },
+            {
+              "source_path": "original2.md",
+              "redirect_url": "https://docs.com/folder/b",
+              "redirect_document_id": "false"
+            },
+            {
+              "source_path": "original3.md",
+              "redirect_url": "https://new-docs.com/folder/c",
+              "redirect_document_id": "true"
+            },
+            {
+              "source_path": "original4.md",
+              "redirect_url": "https://new-docs.com/folder/d",
+              "redirect_document_id": "false"
+            },
+            {
+              "source_path": "original5.md",
+              "redirect_url": "https://docs-diff.com/folder/c",
+              "redirect_document_id": "true"
+            },
+            {
+              "source_path": "original6.md",
+              "redirect_url": "https://docs-diff.com/folder/d",
+              "redirect_document_id": "false"
+            },
+          ]
+        }
+      docfx.yml: |
+        hostname: docs.com
+        alternativeHostName: new-docs.com
+        name: docset
+        product: product
+      folder/index.md:
+outputs:
+  folder/index.json: 
+  .publish.json: |
+      {
+          "name": "docset",
+          "product": "product",
+          "base_path": "/",
+          "files": [
+              {
+                  "url": "/folder/",
+                  "path": "folder/index.json",
+                  "source_path": "folder/index.md",
+                  "canonical_url": "https://docs.com/en-us/folder/",
+                  "document_id": "87407f22-7c8e-317e-430d-96980c2fd1a6",
+                  "document_version_independent_id": "87407f22-7c8e-317e-430d-96980c2fd1a6",
+                  "site_name": "Docs",
+                  "depot_name": "product.docset",
+              },
+              {
+                  "url": "/original",
+                  "redirect_url": "/folder/a",
+                  "document_id": "6172869a-1d42-80e4-5d0c-707167a0d4c1",
+                  "document_version_independent_id": "6172869a-1d42-80e4-5d0c-707167a0d4c1",
+                  "canonical_url": "https://docs.com/en-us/original"
+              },
+              {
+                  "url": "/original2",
+                  "redirect_url": "/folder/b",
+                  "document_id": "0e929cdb-46ae-915a-031f-4c6f8e8f6a1a",
+                  "document_version_independent_id": "0e929cdb-46ae-915a-031f-4c6f8e8f6a1a",
+                  "canonical_url": "https://docs.com/en-us/original2"
+              },
+              {
+                  "url": "/original3",
+                  "redirect_url": "/folder/c",
+                  "document_id": "01bf1826-aa28-49c6-d258-4c3837762c95",
+                  "document_version_independent_id": "01bf1826-aa28-49c6-d258-4c3837762c95",
+                  "canonical_url": "https://docs.com/en-us/original3"
+              },
+              {
+                  "url": "/original4",
+                  "redirect_url": "/folder/d",
+                  "document_id": "168b8137-5da2-ede9-224a-b295bb82ee6a",
+                  "document_version_independent_id": "168b8137-5da2-ede9-224a-b295bb82ee6a",
+                  "canonical_url": "https://docs.com/en-us/original4"
+              },
+              {
+                  "url": "/original5",
+                  "redirect_url": "https://docs-diff.com/folder/c",
+                  "document_id": "5269a2f9-8e29-8fed-7da3-4b08cbcb5972",
+                  "document_version_independent_id": "5269a2f9-8e29-8fed-7da3-4b08cbcb5972",
+                  "canonical_url": "https://docs.com/en-us/original5"
+              },
+              {
+                  "url": "/original6",
+                  "redirect_url": "https://docs-diff.com/folder/d",
+                  "document_id": "3c570421-59fc-1dc7-d86a-43dbdf5d391b",
+                  "document_version_independent_id": "3c570421-59fc-1dc7-d86a-43dbdf5d391b",
+                  "canonical_url": "https://docs.com/en-us/original6"
+              }
+          ]
+      }
+  .errors.log: |
+      {"message_severity":"suggestion","code":"redirect-url-invalid","message":"Can't redirect document ID for redirected file 'original.md' because redirect URL 'https://docs.com/folder/a' is invalid or is in a different docset. Specify a redirect_url in the same docset, or set redirect_document_id to false in .openpublishing.redirection.json.","file":"redirections.json"}
+      {"message_severity":"suggestion","code":"redirect-url-invalid","message":"Can't redirect document ID for redirected file 'original3.md' because redirect URL 'https://new-docs.com/folder/c' is invalid or is in a different docset. Specify a redirect_url in the same docset, or set redirect_document_id to false in .openpublishing.redirection.json.","file":"redirections.json"}
+      {"message_severity":"suggestion","code":"redirect-url-invalid","message":"Can't redirect document ID for redirected file 'original5.md' because redirect URL 'https://docs-diff.com/folder/c' is invalid or is in a different docset. Specify a redirect_url in the same docset, or set redirect_document_id to false in .openpublishing.redirection.json.","file":"redirections.json"}
+---
+# convert relative redirect url to absolute path in despite of redirect_document_id config
+repos:
+  https://docs.com/ops/redirect:
+  - files:
+      redirections.json: |
+        {
+          "redirections": [
+            {
+              "source_path": "original.md",
+              "redirect_url": "folder/a",
+              "redirect_document_id": "true"
+            },
+            {
+              "source_path": "original2.md",
+              "redirect_url": "folder/b",
+              "redirect_document_id": "false"
+            }
+          ]
+        }
+      docfx.yml: |
+        hostname: docs.com
+        name: docset
+        product: product
+      folder/index.md:
+outputs:
+  folder/index.json: 
+  .publish.json: |
+    {
+        "name": "docset",
+        "product": "product",
+        "base_path": "/",
+        "files": [           
+            {
+                "url": "/folder/",
+                "path": "folder/index.json",
+                "source_path": "folder/index.md",
+                "locale": "en-us",
+                "canonical_url": "https://docs.com/en-us/folder/",
+                "document_id": "87407f22-7c8e-317e-430d-96980c2fd1a6",
+                "document_version_independent_id": "87407f22-7c8e-317e-430d-96980c2fd1a6",
+                "site_name": "Docs",
+                "depot_name": "product.docset",
+            },
+            {
+                "url": "/original",
+                "locale": "en-us",
+                "redirect_url": "/folder/a",
+                "document_id": "6172869a-1d42-80e4-5d0c-707167a0d4c1",
+                "document_version_independent_id": "6172869a-1d42-80e4-5d0c-707167a0d4c1",
+                "canonical_url": "https://docs.com/en-us/original"
+            },
+            {
+                "url": "/original2",
+                "locale": "en-us",
+                "redirect_url": "/folder/b",
+                "document_id": "0e929cdb-46ae-915a-031f-4c6f8e8f6a1a",
+                "document_version_independent_id": "0e929cdb-46ae-915a-031f-4c6f8e8f6a1a",
+                "canonical_url": "https://docs.com/en-us/original2"
+            }
+        ]
+    }
+  .errors.log: |
+      {"message_severity":"suggestion","code":"redirect-url-invalid","message":"Can't redirect document ID for redirected file 'original.md' because redirect URL 'folder/a' is invalid or is in a different docset. Specify a redirect_url in the same docset, or set redirect_document_id to false in .openpublishing.redirection.json.","file":"redirections.json"}

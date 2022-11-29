@@ -229,6 +229,13 @@ internal static class Errors
         /// Behavior: ❌ Message: ✔️
         public static Error CommittishNotFound(string repo, string committish)
             => new(ErrorLevel.Error, "committish-not-found", $"Can't find branch, tag, or commit '{committish}' for repo {repo}.");
+
+        /// <summary>
+        /// Must use `main` or `master` or default for template branch.
+        /// </summary>
+        /// Behavior: ❌ Message: ❌
+        public static Error TemplateBranchInvalid(string templateBranch)
+            => new(ErrorLevel.Error, "template-branch-invalid", $"Invalid template branch: '{templateBranch}'. Template branch must be 'main' or 'master' or default.");
     }
 
     public static class Link
@@ -346,13 +353,6 @@ internal static class Errors
         /// Behavior: ✔️ Message: ✔️
         public static Error RedirectedFileNotRemoved(IEnumerable<string> pathList)
             => new(ErrorLevel.Warning, "redirected-file-not-removed", $"Redirected file '{string.Join(", ", pathList)}' are still in the repo. After adding a file to the redirection JSON file, you must delete the original file from the repo.");
-
-        /// <summary>
-        /// A redirection file registered in .openpublishing.publish.json is not found in the repo.
-        /// </summary>
-        /// Behavior: ✔️ Message: ✔️
-        public static Error RedirectionFileNotFound(string path)
-            => new(ErrorLevel.Error, "redirection-file-not-found", $"Redirection file '{path}' registered in .openpublishing.publish.json is not found in the repo.");
 
         /// <summary>
         /// A redirection item cannot contain ‘source_path’ and ‘source_path_from_root’ at the same time.
@@ -824,7 +824,7 @@ internal static class Errors
         /// </summary>
         /// Behavior: ✔️ Message: ✔️
         public static Error ServiceAccountPermissionInsufficient(string? repoOrg, string? repoOwner, string dependentRepoUrl)
-            => new(ErrorLevel.Error, "service-account-permission-insufficient", $"Docs Build service account cannot access repository '{dependentRepoUrl}'. Please ask repository owner '{repoOwner}' to grant 'write' permission to all service accounts under '{repoOrg}' organization to '{dependentRepoUrl}'. Service accounts list can be found here: https://review.docs.microsoft.com/en-us/engineering/projects/ops/engdocs/how-to-grant-service-account-permission-in-your-repository?branch=master#{repoOrg?.ToLowerInvariant()}. For any support, please open a ticket in https://aka.ms/SiteHelp.");
+            => new(ErrorLevel.Error, "service-account-permission-insufficient", $"Docs Build service account cannot access repository '{dependentRepoUrl}'. Please ask repository owner '{repoOwner}' to grant 'write' permission to all service accounts under '{repoOrg}' organization to '{dependentRepoUrl}'. Service accounts list can be found here: https://review.learn.microsoft.com/en-us/engineering/projects/ops/engdocs/how-to-grant-service-account-permission-in-your-repository?branch=master#{repoOrg?.ToLowerInvariant()}. For any support, please open a ticket in https://aka.ms/SiteHelp.");
 
         /// <summary>
         /// Repository owner does not have 'Read' permission on CRR.
