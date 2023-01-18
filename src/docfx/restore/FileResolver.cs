@@ -21,23 +21,17 @@ internal class FileResolver
     });
 
     private readonly Lazy<string?>? _fallbackDocsetPath;
-    private readonly CredentialHandler _credentialHandler;
-    private readonly OpsConfigAdapter? _opsConfigAdapter;
     private readonly FetchOptions _fetchOptions;
     private readonly Package _package;
 
     public FileResolver(
         Package package,
         Lazy<string?>? fallbackDocsetPath = null,
-        CredentialHandler? credentialHandler = null,
-        OpsConfigAdapter? opsConfigAdapter = null,
         FetchOptions fetchOptions = default)
     {
         _package = package;
         _fallbackDocsetPath = fallbackDocsetPath;
-        _opsConfigAdapter = opsConfigAdapter;
         _fetchOptions = fetchOptions;
-        _credentialHandler = credentialHandler ?? new();
     }
 
     public string? TryReadString(SourceInfo<string> file)
@@ -237,30 +231,14 @@ internal class FileResolver
 
     private async Task<HttpResponseMessage> GetAsync(string url, EntityTagHeaderValue? etag = null)
     {
-        return await _credentialHandler.SendRequest(
-            () =>
-            {
-                // Create new instance of HttpRequestMessage to avoid System.InvalidOperationException:
-                // "The request message was already sent. Cannot send the same request message multiple times."
-                var request = new HttpRequestMessage(HttpMethod.Get, url);
-                if (etag != null)
-                {
-                    request.Headers.IfNoneMatch.Add(etag);
-                }
-                return request;
-            },
-            async request =>
-            {
-                if (_opsConfigAdapter != null)
-                {
-                    var response = await _opsConfigAdapter.InterceptHttpRequest(request);
-                    if (response != null)
-                    {
-                        return response;
-                    }
-                }
+        // Create new instance of HttpRequestMessage to avoid System.InvalidOperationException:
+        // "The request message was already sent. Cannot send the same request message multiple times."
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        if (etag != null)
+        {
+            request.Headers.IfNoneMatch.Add(etag);
+        }
 
-                return await s_httpClient.SendAsync(request);
-            });
+        return await s_httpClient.SendAsync(request);
     }
 }

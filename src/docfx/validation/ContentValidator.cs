@@ -52,7 +52,7 @@ internal class ContentValidator : ICollectionFactory
                 fileResolver.ResolveFilePath(_config.Allowlists),
                 fileResolver.ResolveFilePath(_config.SandboxEnabledModuleList),
                 this,
-                GetUserSetting(EnvironmentVariable.GetDocsEnvironment()));
+                GetUserSetting());
         }
         catch (Exception ex)
         {
@@ -346,16 +346,11 @@ internal class ContentValidator : ICollectionFactory
         }
     }
 
-    private static UserSetting GetUserSetting(DocsEnvironment environment)
+    private static UserSetting GetUserSetting()
     {
         var configurationBuilder = new ConfigurationBuilder();
         var configPath = "validation/brokenLinkValidationUserSetting/";
         configurationBuilder.AddJsonFile(configPath + "config.json");
-
-        if (environment == DocsEnvironment.Prod || environment == DocsEnvironment.PPE)
-        {
-            configurationBuilder.AddJsonFile(configPath + $"config.{environment.ToString().ToLowerInvariant()}.json");
-        }
 
         return configurationBuilder.Build().Get<UserSetting>();
     }

@@ -33,7 +33,7 @@ internal static class ConfigLoader
     /// <summary>
     /// Load the config under <paramref name="docsetPath"/>
     /// </summary>
-    public static (Config, BuildOptions, PackageResolver, FileResolver, OpsAccessor) Load(
+    public static (Config, BuildOptions, PackageResolver, FileResolver) Load(
         ErrorBuilder errors,
         Repository? repository,
         string docsetPath,
@@ -66,13 +66,11 @@ internal static class ConfigLoader
             Log.Write($"stdin config: {stdinObj}");
         }
 
-        var (xrefEndpoint, xrefQueryTags, opsConfig) = OpsConfigLoader.LoadDocfxConfig(errors, repository, package);
-
         var globalConfig = LoadConfig(errors, package, new PathString(AppData.Root));
 
         // Preload
         var preloadConfigObject = new JObject();
-        JsonUtility.Merge(unionProperties, preloadConfigObject, envConfig, globalConfig, opsConfig, docfxConfig, cliConfig);
+        JsonUtility.Merge(unionProperties, preloadConfigObject, envConfig, globalConfig, docfxConfig, cliConfig);
         var preloadConfig = JsonUtility.ToObject<PreloadConfig>(errors, preloadConfigObject);
 
         // Download dependencies
@@ -82,30 +80,27 @@ internal static class ConfigLoader
             credentialProviders.Add(getCredential);
         }
         credentialProviders.Add((url, _, _) => Task.FromResult(preloadConfig.Secrets.GetHttpConfig(url)));
-        var credentialHandler = new CredentialHandler(credentialProviders.ToArray());
-        var opsAccessor = new OpsAccessor(errors, credentialHandler);
-        var configAdapter = new OpsConfigAdapter(opsAccessor);
 
         PackageResolver? packageResolver = default;
         var fallbackDocsetPath = new Lazy<string?>(
             () => LocalizationUtility.GetFallbackDocsetPath(docsetPath, repository, preloadConfig.FallbackRepository, packageResolver!));
-        var fileResolver = new FileResolver(package, fallbackDocsetPath, credentialHandler, configAdapter, fetchOptions);
+        var fileResolver = new FileResolver(package, fallbackDocsetPath, fetchOptions);
 
-        packageResolver = new PackageResolver(errors, docsetPath, preloadConfig, fetchOptions, fileResolver, repository, opsAccessor);
+        packageResolver = new PackageResolver(errors, docsetPath, preloadConfig, fetchOptions, fileResolver, repository);
 
         var buildOptions = new BuildOptions(docsetPath, fallbackDocsetPath.Value, outputPath, repository, preloadConfig, package);
         var extendConfig = DownloadExtendConfig(
-            errors, buildOptions.Locale, preloadConfig, xrefEndpoint, xrefQueryTags, repository, preloadConfig.PublishRepositoryUrl, fileResolver);
+            errors, buildOptions.Locale, preloadConfig, null, null, repository, preloadConfig.PublishRepositoryUrl, fileResolver);
 
         // Create full config
         var configObject = new JObject();
-        JsonUtility.Merge(unionProperties, configObject, envConfig, globalConfig, extendConfig, opsConfig, docfxConfig, cliConfig);
+        JsonUtility.Merge(unionProperties, configObject, envConfig, globalConfig, extendConfig, docfxConfig, cliConfig);
         var config = JsonUtility.ToObject<Config>(errors, configObject);
         if (config.ValidateTemplateBranch)
         {
             ValidateTemplateBranch(config.Template);
         }
-        return (config, buildOptions, packageResolver, fileResolver, opsAccessor);
+        return (config, buildOptions, packageResolver, fileResolver);
     }
 
     internal static JObject LoadEnvironmentVariables(IEnumerable<DictionaryEntry> environmentVariables)
@@ -240,21 +235,6 @@ internal static class ConfigLoader
 
     private static Func<string, bool>? FindDocsetsGlob(ErrorBuilder errors, Package package, Repository? repository)
     {
-        var opsConfig = OpsConfigLoader.LoadOpsConfig(errors, package, repository);
-        if (opsConfig != null && opsConfig.DocsetsToPublish.Length > 0)
-        {
-            return docsetFolder =>
-            {
-                var docsetDirectoryName = Path.GetDirectoryName(docsetFolder);
-                if (docsetDirectoryName is null)
-                {
-                    return false;
-                }
-                var sourceFolder = new PathString(docsetDirectoryName);
-                return opsConfig.DocsetsToPublish.Any(docset => docset.BuildSourceFolder.FolderEquals(sourceFolder));
-            };
-        }
-
         var config = package.TryLoadYamlOrJson<DocsetsConfig>(errors, "docsets");
         if (config != null)
         {

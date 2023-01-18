@@ -42,8 +42,7 @@ internal static class Restore
         {
             // load configuration from current entry or fallback repository
             var localPackage = new LocalPackage(Path.Combine(options.WorkingDirectory, docsetPath));
-            var (config, buildOptions, packageResolver, fileResolver, _) = ConfigLoader.Load(
-                errorLog, repository, docsetPath, outputPath, options, fetchOptions, localPackage);
+            var (config, buildOptions, packageResolver, fileResolver) = ConfigLoader.Load(errorLog, repository, docsetPath, outputPath, options, fetchOptions, localPackage);
 
             if (errorLog.HasError)
             {

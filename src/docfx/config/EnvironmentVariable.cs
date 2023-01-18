@@ -27,13 +27,6 @@ public static class EnvironmentVariable
 
     public static string? SessionId => GetValue("DOCFX_SESSION_ID");
 
-    public static DocsEnvironment GetDocsEnvironment()
-    {
-        return Enum.TryParse(GetValue("DOCS_ENVIRONMENT"), true, out DocsEnvironment docsEnvironment)
-            ? docsEnvironment
-            : DocsEnvironment.Prod;
-    }
-
     private static string? GetValue(string name)
     {
         var value = Environment.GetEnvironmentVariable(name);

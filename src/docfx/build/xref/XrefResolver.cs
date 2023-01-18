@@ -291,15 +291,6 @@ internal class XrefResolver
         url = RemoveHostIfMatch(url, _config.HostName);
         url = RemoveHostIfMatch(url, _config.AlternativeHostName);
 
-        url = RemoveHostIfMatch(url, OpsConfigAdapter.GetXrefHostNameByHostName(
-            _config.HostName,
-            _repository?.Branch,
-            TestQuirks.BuildEnvironment?.Invoke()));
-        url = RemoveHostIfMatch(url, OpsConfigAdapter.GetXrefHostNameByHostName(
-            _config.AlternativeHostName,
-            _repository?.Branch,
-            TestQuirks.BuildEnvironment?.Invoke()));
-
         return url;
 
         static string RemoveHostIfMatch(string url, string hostName)
@@ -352,7 +343,7 @@ internal class XrefResolver
 
             var dependencyType = GetDependencyType(referencingFile, spec);
             _dependencyMapBuilder.AddDependencyItem(referencingFile, spec.DeclaringFile, dependencyType);
-            
+
             // Output absolute URL starting from Architecture and TSType
             //var href = JsonSchemaProvider.OutputAbsoluteUrl(_documentProvider.GetMime(inclusionRoot))
             //    ? spec.Href

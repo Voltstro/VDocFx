@@ -16,7 +16,6 @@ internal class DocsetBuilder
     private readonly PackageResolver _packageResolver;
     private readonly FileResolver _fileResolver;
     private readonly GitHubAccessor _githubAccessor;
-    private readonly OpsAccessor _opsAccessor;
     private readonly MicrosoftGraphAccessor _microsoftGraphAccessor;
     private readonly RepositoryProvider _repositoryProvider;
     private readonly SourceMap _sourceMap;
@@ -56,7 +55,6 @@ internal class DocsetBuilder
         BuildOptions buildOptions,
         PackageResolver packageResolver,
         FileResolver fileResolver,
-        OpsAccessor opsAccessor,
         RepositoryProvider repositoryProvider,
         Package package,
         IProgress<string> progressReporter)
@@ -66,13 +64,12 @@ internal class DocsetBuilder
         _buildOptions = buildOptions;
         _packageResolver = packageResolver;
         _fileResolver = fileResolver;
-        _opsAccessor = opsAccessor;
         _repositoryProvider = repositoryProvider;
         _progressReporter = progressReporter;
         _sourceMap = _errors.SourceMap = new(_errors, new(_buildOptions.DocsetPath), _config, _fileResolver);
         _input = new(_buildOptions, _config, _packageResolver, _repositoryProvider, _sourceMap, package);
         _buildScope = new(_config, _input, _buildOptions);
-        _githubAccessor = new(_config, TestQuirks.OpsGetAccessTokenProxy?.Invoke(null) ?? opsAccessor.GetAccessTokenForUserProfile().GetAwaiter().GetResult());
+        _githubAccessor = new(_config, TestQuirks.OpsGetAccessTokenProxy?.Invoke(null));
         _microsoftGraphAccessor = new(_config);
         _jsonSchemaLoader = new(_fileResolver);
         _metadataProvider = _errors.MetadataProvider = new(_config, _input, _buildScope);
@@ -116,7 +113,7 @@ internal class DocsetBuilder
         {
             progressReporter.Report("Loading config...");
             var fetchOptions = options.NoRestore ? FetchOptions.NoFetch : (options.NoCache ? FetchOptions.Latest : FetchOptions.UseCache);
-            var (config, buildOptions, packageResolver, fileResolver, opsAccessor) = ConfigLoader.Load(
+            var (config, buildOptions, packageResolver, fileResolver) = ConfigLoader.Load(
                errorLog, repository, docsetPath, outputPath, options, fetchOptions, package, getCredential);
 
             if (errorLog.HasError)
@@ -138,12 +135,7 @@ internal class DocsetBuilder
 
             var repositoryProvider = new RepositoryProvider(errorLog, buildOptions, config);
 
-            if (!new OpsPreProcessor(config, errorLog, buildOptions, repositoryProvider).Run())
-            {
-                return null;
-            }
-
-            return new DocsetBuilder(errorLog, config, buildOptions, packageResolver, fileResolver, opsAccessor, repositoryProvider, package, progressReporter);
+            return new DocsetBuilder(errorLog, config, buildOptions, packageResolver, fileResolver, repositoryProvider, package, progressReporter);
         }
         catch (Exception ex) when (DocfxException.IsDocfxException(ex, out var dex))
         {
@@ -216,8 +208,6 @@ internal class DocsetBuilder
                 () => output.WriteJson($"{basePath}.dependencymap.json", dependencyMap.ToDependencyMapModel()),
                 () => output.WriteJson($"{basePath}.links.json", _fileLinkMapBuilder.Build(publishModel)),
                 () => output.WriteXDocument($"{basePath}sitemap.xml", siteMapBuilder.Build()));
-
-            new OpsPostProcessor(_config, _errors, _buildOptions, _opsAccessor, _jsonSchemaTransformer.GetValidateExternalXrefs()).Run();
         }
         catch (Exception ex) when (DocfxException.IsDocfxException(ex, out var dex))
         {

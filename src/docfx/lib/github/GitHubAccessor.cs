@@ -23,7 +23,7 @@ internal sealed class GitHubAccessor
 
     private volatile Error? _fatalError;
 
-    public GitHubAccessor(Config config, string githubToken)
+    public GitHubAccessor(Config config, string? githubToken)
     {
         _userCache = new(
             AppData.GitHubUserCachePath,

@@ -149,16 +149,12 @@ internal static partial class GitUtility
         ExecuteNonQuery(path, $"-c core.longpaths=true checkout --progress {options} {committish}");
     }
 
-    public static void Fetch(SecretConfig secrets, OpsAccessor opsAccessor, string path, string url, string refspecs, string? options = null)
+    public static void Fetch(SecretConfig secrets, string path, string url, string refspecs, string? options = null)
     {
         // Allow test to proxy remotes to local folder
         url = TestQuirks.GitRemoteProxy?.Invoke(url) ?? url;
 
         var (http, secret) = GetGitCommandLineConfigFromSecretConfig(url, secrets);
-        if (string.IsNullOrEmpty(secret))
-        {
-            (http, secret) = GetGitCommandLineConfigFromBuildService(url, opsAccessor);
-        }
 
         ExecuteNonQuery(path, $"{http} -c core.longpaths=true fetch --progress {options} \"{url}\" {refspecs}", secret);
     }
@@ -274,26 +270,5 @@ internal static partial class GitUtility
             }
             return header.Value;
         }
-    }
-
-    private static (string? cmd, string? secret) GetGitCommandLineConfigFromBuildService(string url, OpsAccessor opsAccessor)
-    {
-        string secret;
-        try
-        {
-            secret = TestQuirks.OpsGetAccessTokenProxy?.Invoke(url) ?? opsAccessor.GetAccessTokenForRepository(url).GetAwaiter().GetResult();
-        }
-        catch
-        {
-            return default;
-        }
-
-        if (string.IsNullOrEmpty(secret))
-        {
-            return default;
-        }
-        var token = Convert.ToBase64String(Encoding.UTF8.GetBytes($"user:{secret}"));
-        var cmd = $"-c http.extraheader=\"Authorization: basic {token}\"";
-        return (cmd, token);
     }
 }
