@@ -16,7 +16,6 @@ internal class DocsetBuilder
     private readonly PackageResolver _packageResolver;
     private readonly FileResolver _fileResolver;
     private readonly GitHubAccessor _githubAccessor;
-    private readonly MicrosoftGraphAccessor _microsoftGraphAccessor;
     private readonly RepositoryProvider _repositoryProvider;
     private readonly SourceMap _sourceMap;
     private readonly Input _input;
@@ -70,7 +69,6 @@ internal class DocsetBuilder
         _input = new(_buildOptions, _config, _packageResolver, _repositoryProvider, _sourceMap, package);
         _buildScope = new(_config, _input, _buildOptions);
         _githubAccessor = new(_config, TestQuirks.OpsGetAccessTokenProxy?.Invoke(null));
-        _microsoftGraphAccessor = new(_config);
         _jsonSchemaLoader = new(_fileResolver);
         _metadataProvider = _errors.MetadataProvider = new(_config, _input, _buildScope);
         _monikerProvider = new(_config, _buildScope, _metadataProvider, _fileResolver);
@@ -91,7 +89,7 @@ internal class DocsetBuilder
         _htmlSanitizer = new(_config);
         _markdownEngine = new(_input, _linkResolver, _xrefResolver, _documentProvider, _monikerProvider, _templateEngine, _contentValidator, _publishUrlMap, _htmlSanitizer, _config.HostName);
         _jsonSchemaTransformer = new(_documentProvider, _markdownEngine, _linkResolver, _xrefResolver, _errors, _monikerProvider, _jsonSchemaProvider, _input);
-        _metadataValidator = new MetadataValidator(_config, _microsoftGraphAccessor, _jsonSchemaLoader, _monikerProvider, _customRuleProvider);
+        _metadataValidator = new MetadataValidator(_config, _jsonSchemaLoader, _monikerProvider, _customRuleProvider);
         _tocParser = new(_input, _markdownEngine);
         _tocLoader = new(_buildOptions, _input, _linkResolver, _xrefResolver, _tocParser, _monikerProvider, _dependencyMapBuilder, _contentValidator, _config, _errors, _buildScope);
         _tocMap = new(_sourceMap, _config, _errors, _input, _buildScope, _dependencyMapBuilder, _tocParser, _tocLoader, _documentProvider, _contentValidator, _publishUrlMap);
@@ -153,8 +151,7 @@ internal class DocsetBuilder
             var output = new Output(_buildOptions.OutputPath, _input, _config.DryRun);
             var publishModelBuilder = new PublishModelBuilder(_config, _errors, _monikerProvider, _buildOptions, _sourceMap, _documentProvider, _contributionProvider, _buildScope);
             var resourceBuilder = new ResourceBuilder(_input, _documentProvider, _config, output, publishModelBuilder);
-            var learnHierarchyBuilder = new LearnHierarchyBuilder(_contentValidator);
-            var pageBuilder = new PageBuilder(_config, _buildOptions, _input, output, _documentProvider, _metadataProvider, _monikerProvider, _publishUrlMap, _templateEngine, _tocMap, _linkResolver, _xrefResolver, _contributionProvider, _bookmarkValidator, publishModelBuilder, _contentValidator, _metadataValidator, _markdownEngine, _redirectionProvider, _jsonSchemaTransformer, learnHierarchyBuilder);
+            var pageBuilder = new PageBuilder(_config, _buildOptions, _input, output, _documentProvider, _metadataProvider, _monikerProvider, _publishUrlMap, _templateEngine, _tocMap, _linkResolver, _xrefResolver, _contributionProvider, _bookmarkValidator, publishModelBuilder, _contentValidator, _metadataValidator, _markdownEngine, _redirectionProvider, _jsonSchemaTransformer);
             var tocBuilder = new TocBuilder(_config, _tocLoader, _contentValidator, _metadataProvider, _metadataValidator, _documentProvider, _monikerProvider, publishModelBuilder, _templateEngine, output);
             var redirectionBuilder = new RedirectionBuilder(publishModelBuilder, _redirectionProvider, _documentProvider);
 
@@ -173,9 +170,7 @@ internal class DocsetBuilder
                 () => _contributionProvider.Save(),
                 () => _repositoryProvider.Save(),
                 () => _errors.AddRange(_githubAccessor.Save()),
-                () => _errors.AddRange(_microsoftGraphAccessor.Save()),
-                () => _jsonSchemaTransformer.PostValidate(files != null),
-                () => learnHierarchyBuilder.ValidateHierarchy());
+                () => _jsonSchemaTransformer.PostValidate(files != null));
 
             if (_config.DryRun)
             {

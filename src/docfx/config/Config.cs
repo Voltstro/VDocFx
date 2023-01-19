@@ -308,21 +308,6 @@ internal class Config : PreloadConfig
     public bool ResolveGithubUsers { get; init; } = true;
 
     /// <summary>
-    /// Determines how long at most an alias remains valid in cache.
-    /// </summary>
-    public int MicrosoftGraphCacheExpirationInHours { get; init; } = 30 * 24;
-
-    /// <summary>
-    /// Tenant id that can be used to access the Microsoft Graph API.
-    /// </summary>
-    public string? MicrosoftGraphTenantId { get; init; }
-
-    /// <summary>
-    /// Client id that can be used to access the Microsoft Graph API.
-    /// </summary>
-    public string? MicrosoftGraphClientId { get; init; }
-
-    /// <summary>
     /// A file containing a map of file path to the original file path.
     /// </summary>
     [JsonConverter(typeof(OneOrManyConverter))]

@@ -12,7 +12,6 @@ internal class JsonSchemaValidator
 {
     private readonly bool _forceError;
     private readonly JsonSchema _schema;
-    private readonly MicrosoftGraphAccessor? _microsoftGraphAccessor;
     private readonly MonikerProvider? _monikerProvider;
     private readonly CustomRuleProvider? _customRuleProvider;
 
@@ -24,14 +23,12 @@ internal class JsonSchemaValidator
 
     public JsonSchemaValidator(
         JsonSchema schema,
-        MicrosoftGraphAccessor? microsoftGraphAccessor = null,
         MonikerProvider? monikerProvider = null,
         bool forceError = false,
         CustomRuleProvider? customRuleProvider = null)
     {
         _schema = schema;
         _forceError = forceError;
-        _microsoftGraphAccessor = microsoftGraphAccessor;
         _monikerProvider = monikerProvider;
         _customRuleProvider = customRuleProvider;
     }
@@ -321,7 +318,6 @@ internal class JsonSchemaValidator
     private void ValidateString(JsonSchema schema, string propertyPath, JValue scalar, string str, List<Error> errors)
     {
         ValidateDateFormat(schema, propertyPath, scalar, str, errors);
-        ValidateMicrosoftAlias(schema, propertyPath, scalar, str, errors);
 
         if (schema.MaxLength.HasValue || schema.MinLength.HasValue)
         {
@@ -558,25 +554,6 @@ internal class JsonSchemaValidator
             else
             {
                 errors.Add(Errors.JsonSchema.DateFormatInvalid(JsonUtility.GetSourceInfo(scalar), propertyPath, dateString));
-            }
-        }
-    }
-
-    private void ValidateMicrosoftAlias(JsonSchema schema, string propertyPath, JValue scalar, string alias, List<Error> errors)
-    {
-        if (schema.MicrosoftAlias != null && !string.IsNullOrWhiteSpace(alias))
-        {
-            if (Array.IndexOf(schema.MicrosoftAlias.AllowedDLs, alias) == -1)
-            {
-                if (_microsoftGraphAccessor != null)
-                {
-                    var error = _microsoftGraphAccessor.ValidateMicrosoftAlias(
-                        new SourceInfo<string>(alias, JsonUtility.GetSourceInfo(scalar)), propertyPath);
-                    if (error != null)
-                    {
-                        errors.Add(error);
-                    }
-                }
             }
         }
     }

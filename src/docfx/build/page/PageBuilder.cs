@@ -29,7 +29,6 @@ internal class PageBuilder
     private readonly MarkdownEngine _markdownEngine;
     private readonly RedirectionProvider _redirectionProvider;
     private readonly JsonSchemaTransformer _jsonSchemaTransformer;
-    private readonly LearnHierarchyBuilder _learnHierarchyBuilder;
 
     public PageBuilder(
         Config config,
@@ -51,8 +50,7 @@ internal class PageBuilder
         MetadataValidator metadataValidator,
         MarkdownEngine markdownEngine,
         RedirectionProvider redirectionProvider,
-        JsonSchemaTransformer jsonSchemaTransformer,
-        LearnHierarchyBuilder learnHierarchyBuilder)
+        JsonSchemaTransformer jsonSchemaTransformer)
     {
         _config = config;
         _buildOptions = buildOptions;
@@ -74,7 +72,6 @@ internal class PageBuilder
         _markdownEngine = markdownEngine;
         _redirectionProvider = redirectionProvider;
         _jsonSchemaTransformer = jsonSchemaTransformer;
-        _learnHierarchyBuilder = learnHierarchyBuilder;
     }
 
     public void Build(ErrorBuilder errors, FilePath file)
@@ -331,32 +328,7 @@ internal class PageBuilder
             throw Errors.JsonSchema.UnexpectedType(new SourceInfo(file, 1, 1), JTokenType.Object, content.Type).ToException();
         }
 
-        switch (mime.Value?.ToLowerInvariant())
-        {
-            case "learningpath":
-                _learnHierarchyBuilder.AddLearningPath(JsonUtility.ToObject<LearningPath>(errors, transformedContent));
-                break;
-
-            case "module":
-                _learnHierarchyBuilder.AddModule(JsonUtility.ToObject<Module>(errors, transformedContent));
-                break;
-
-            case "moduleunit":
-                _learnHierarchyBuilder.AddModuleUnit(JsonUtility.ToObject<ModuleUnit>(errors, transformedContent));
-                break;
-
-            case "achievements":
-                _learnHierarchyBuilder.AddAchievements(JsonUtility.ToObject<AchievementArray>(errors, transformedContent));
-                break;
-        }
-
         JsonUtility.Merge(pageModel, transformedContent);
-
-        if (JsonSchemaProvider.IsLandingData(mime))
-        {
-            var landingData = JsonUtility.ToObject<LandingData>(errors, pageModel);
-            pageModel["conceptual"] = RazorTemplate.Render(mime, landingData).GetAwaiter().GetResult();
-        }
 
         return pageModel;
     }

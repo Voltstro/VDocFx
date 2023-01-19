@@ -14,7 +14,6 @@ internal class MetadataValidator
 
     public MetadataValidator(
         Config config,
-        MicrosoftGraphAccessor microsoftGraphAccessor,
         JsonSchemaLoader jsonSchemaLoader,
         MonikerProvider monikerProvider,
         CustomRuleProvider customRuleProvider)
@@ -23,7 +22,7 @@ internal class MetadataValidator
 
         _schemaValidators = Array.ConvertAll(
             MetadataSchemas,
-            schema => new JsonSchemaValidator(schema, microsoftGraphAccessor, monikerProvider, false, customRuleProvider));
+            schema => new JsonSchemaValidator(schema, monikerProvider, false, customRuleProvider));
 
         _reservedMetadata = JsonUtility.GetPropertyNames(typeof(SystemMetadata))
             .Concat(JsonUtility.GetPropertyNames(typeof(ConceptualModel)))
