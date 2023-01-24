@@ -16,7 +16,6 @@
     <PackageReference Include="HtmlReaderWriter" Version="1.0.0" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.315" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.3" />
-    <PackageReference Include="Microsoft.Docs.MetadataService.Models" Version="0.3.6" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
     <PackageReference Include="Microsoft.Experimental.Collections" Version="1.0.6-e190117-3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
