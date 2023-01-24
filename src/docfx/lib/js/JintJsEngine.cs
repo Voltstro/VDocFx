@@ -56,7 +56,7 @@ internal sealed class JintJsEngine : JavaScriptEngine
         module.Set("exports", exports);
 
         var sourceCode = _package.ReadString(scriptPath);
-        var parserOptions = new ParserOptions(scriptPath);
+        var parserOptions = new ParserOptions();
 
         // add process to input to get the correct file path while running script inside docs-ui
         var script = $@"
@@ -67,7 +67,7 @@ internal sealed class JintJsEngine : JavaScriptEngine
         var dirname = Path.GetDirectoryName(scriptPath) ?? "";
         var require = new ClrFunctionInstance(engine, "require", Require);
 
-        var func = engine.Evaluate(script, parserOptions);
+        var func = engine.Evaluate(script, scriptPath, parserOptions);
         _engine.Invoke(func, module, exports, dirname, require, MakeObject());
         return _modules[scriptPath] = module.Get("exports");
 

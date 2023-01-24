@@ -3,8 +3,8 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Docs.BrokenLinkService.Validator.ConfigModel;
 using Microsoft.Docs.Validation;
-using Microsoft.Docs.Validation.Common;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Docs.Build;
@@ -15,7 +15,7 @@ internal class ContentValidator : ICollectionFactory
     // Learn content: "learningpath", "module", "moduleunit"
     private static readonly string[] s_supportedPageTypes =
     {
-        "conceptual", "toc", "redirection", "learningpath", "module", "moduleunit", "zonepivotgroups", "post",
+        "conceptual", "toc", "redirection", "zonepivotgroups", "post",
     };
 
     private readonly Config _config;
@@ -346,12 +346,12 @@ internal class ContentValidator : ICollectionFactory
         }
     }
 
-    private static UserSetting GetUserSetting()
+    private static BrokenLinkValidatorConfig.UserSetting GetUserSetting()
     {
         var configurationBuilder = new ConfigurationBuilder();
         var configPath = "validation/brokenLinkValidationUserSetting/";
         configurationBuilder.AddJsonFile(configPath + "config.json");
 
-        return configurationBuilder.Build().Get<UserSetting>();
+        return configurationBuilder.Build().Get<BrokenLinkValidatorConfig.UserSetting>();
     }
 }

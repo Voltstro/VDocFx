@@ -133,11 +133,11 @@ internal class TemplateEngine
             return;
         }
 
-        var glob = GlobUtility.CreateGlobMatcher(_templateDefinition.Value.Assets);
+        var glob = new Glob(_templateDefinition.Value.Assets, null);
 
         Parallel.ForEach(_package.GetFiles(), file =>
         {
-            if (glob(file))
+            if (glob.IsMatch(file))
             {
                 output.Copy(file, _package, file);
             }

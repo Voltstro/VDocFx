@@ -130,7 +130,7 @@ internal class TocLoader
         {
             foreach (var item in itemsToMatch)
             {
-                if (item.Value.Name != null && !matched.Contains(item) && GlobUtility.CreateGlobMatcher(pattern)(item.Value.Name!))
+                if (item.Value.Name != null && !matched.Contains(item) && new Glob(new[] { pattern }, null).IsMatch(item.Value.Name!))
                 {
                     matched.Add(item);
                     node.Items.Add(item);

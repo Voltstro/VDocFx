@@ -11,8 +11,8 @@ internal class MetadataProvider
     private readonly Input _input;
     private readonly BuildScope _buildScope;
     private readonly JObject _globalMetadata;
-    private readonly List<(Func<string, bool> glob, string key, JToken value)> _rules = new();
-    private readonly List<(Func<string, bool> glob, string key, JToken value)> _monikerRules = new();
+    private readonly List<(Glob, string key, JToken value)> _rules = new();
+    private readonly List<(Glob, string key, JToken value)> _monikerRules = new();
 
     private readonly ConcurrentDictionary<FilePath, Watch<(ErrorList, UserMetadata)>> _metadataCache = new();
 
@@ -31,12 +31,12 @@ internal class MetadataProvider
                     : null;
 
                 JsonUtility.SetSourceInfo(value, source);
-                var matcher = GlobUtility.CreateGlobMatcher(glob);
-                _rules.Add((matcher, key, value));
+                var globMatcher = new Glob(new[] { glob }, null);
+                _rules.Add((globMatcher, key, value));
 
                 if (key.Contains("moniker", StringComparison.OrdinalIgnoreCase))
                 {
-                    _monikerRules.Add((matcher, key, value));
+                    _monikerRules.Add((globMatcher, key, value));
                 }
             }
         }
@@ -69,7 +69,7 @@ internal class MetadataProvider
         {
             foreach (var (glob, key, value) in rules)
             {
-                if (glob(file.Path))
+                if (glob.IsMatch(file.Path))
                 {
                     fileMetadata.SetProperty(key, value);
                 }

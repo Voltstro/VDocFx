@@ -10,9 +10,8 @@ internal class BuildScope
 {
     private readonly Config _config;
     private readonly BuildOptions _buildOptions;
-    private readonly (Func<string, bool>, FileMappingConfig)[] _globs;
+    private readonly Glob _glob;
     private readonly Input _input;
-    private readonly Func<string, bool>[] _resourceGlobs;
     private readonly HashSet<string> _configReferences;
 
     // On a case insensitive system, cannot simply get the actual file casing:
@@ -20,7 +19,7 @@ internal class BuildScope
     // This lookup table stores a list of actual filenames.
     private readonly Watch<(HashSet<FilePath> allFiles, IReadOnlyDictionary<FilePath, ContentType> files)> _files;
 
-    private readonly ConcurrentDictionary<PathString, (PathString, FileMappingConfig?)> _fileMappings = new();
+    private readonly ConcurrentDictionary<PathString, PathString> _fileMappings = new();
 
     /// <summary>
     /// Gets all the files and fallback files to build, excluding redirections.
@@ -32,8 +31,7 @@ internal class BuildScope
         _config = config;
         _buildOptions = buildOptions;
         _input = input;
-        _globs = CreateGlobs(config);
-        _resourceGlobs = CreateResourceGlob(config);
+        _glob = new Glob(config.Files, config.Exclude);
         _configReferences = config.Extend.Concat(config.GetFileReferences()).Select(path => PathUtility.Normalize(path.Value))
             .ToHashSet(PathUtility.PathComparer);
 
@@ -83,14 +81,6 @@ internal class BuildScope
             return ContentType.Unknown;
         }
 
-        foreach (var glob in _resourceGlobs)
-        {
-            if (glob(path))
-            {
-                return ContentType.Resource;
-            }
-        }
-
         if (!path.EndsWith(".md", PathUtility.PathComparison) &&
             !path.EndsWith(".json", PathUtility.PathComparison) &&
             !path.EndsWith(".yml", PathUtility.PathComparison))
@@ -106,23 +96,11 @@ internal class BuildScope
         return ContentType.Page;
     }
 
-    public bool Contains(PathString path)
-    {
-        return MapPath(path).mapping != null;
-    }
-
-    public (PathString path, FileMappingConfig? mapping) MapPath(PathString path)
+    public PathString MapPath(PathString path)
     {
         return _fileMappings.GetOrAdd(path, _ =>
         {
-            foreach (var (glob, mapping) in _globs)
-            {
-                if (path.StartsWithPath(mapping.Src, out var remainingPath) && glob(remainingPath))
-                {
-                    return (mapping.Dest.Concat(remainingPath), mapping);
-                }
-            }
-            return (path, null);
+            return path;
         });
     }
 
@@ -146,25 +124,11 @@ internal class BuildScope
             var allFiles = new HashSet<FilePath>();
             var files = new DictionaryBuilder<FilePath, ContentType>();
 
-            var defaultFiles = _input.ListFilesRecursive(FileOrigin.Main);
-            allFiles.UnionWith(defaultFiles);
-
-            var additonalFiles = _input.ListAdditionalFilesFromMain();
-            allFiles.UnionWith(additonalFiles);
-
-            if (_buildOptions.IsLocalizedBuild)
-            {
-                var fileNames = defaultFiles.Select(file => file.Path).ToHashSet();
-                var fallbackFiles = _input.ListFilesRecursive(FileOrigin.Fallback).Where(file => !fileNames.Contains(file.Path));
-                allFiles.UnionWith(fallbackFiles);
-            }
-
+            var foundFiles = _glob.GetMatchesInDirectory(_input.GetMainPath()).Select(x => FilePath.Content(new PathString(x)));
+            allFiles.UnionWith(foundFiles);
             Parallel.ForEach(allFiles, file =>
             {
-                if (Contains(file.Path))
-                {
-                    files.TryAdd(file, GetContentType(file));
-                }
+                files.TryAdd(file, GetContentType(file));
             });
 
             Parallel.ForEach(_config.Dependencies, dep =>
@@ -179,7 +143,7 @@ internal class BuildScope
                 {
                     Parallel.ForEach(depFiles, file =>
                     {
-                        if (Contains(file.Path))
+                        if (_glob.IsMatch(file.Path))
                         {
                             files.TryAdd(file, GetContentType(file));
                         }
@@ -189,31 +153,5 @@ internal class BuildScope
 
             return (allFiles, files.AsDictionary());
         }
-    }
-
-    private (Func<string, bool>, FileMappingConfig)[] CreateGlobs(Config config)
-    {
-        if (config.Content.Length == 0 && config.Resource.Length == 0)
-        {
-            string path = _input.GetMainPath();
-            var glob = GlobUtility.CreateGlobMatcher(config.Files, config.Exclude.Concat(Config.DefaultExclude).ToArray(), path);
-            return new[] { (glob, new FileMappingConfig()) };
-        }
-
-        throw new NotSupportedException();
-
-        // Support v2 src/dest config per file group
-        /*
-        return (from mapping in config.Content.Concat(config.Resource)
-                let glob = GlobUtility.CreateGlobMatcher(
-                    mapping.Files, mapping.Exclude.Concat(Config.DefaultExclude).ToArray())
-                select (glob, mapping)).ToArray();
-                */
-    }
-
-    private Func<string, bool>[] CreateResourceGlob(Config config)
-    {
-        return (from mapping in config.Resource
-                select GlobUtility.CreateGlobMatcher(mapping.Files, mapping.Exclude.Concat(Config.DefaultExclude).ToArray(), _input.GetMainPath())).ToArray();
     }
 }

@@ -190,7 +190,8 @@ internal class LinkResolver
             return (errors, UrlUtility.MergeUrl(siteUrl, query, fragment), null, linkType, file, false);
         }
 
-        if (error is null && _buildScope.OutOfScope(file))
+        var outOfScope = _buildScope.OutOfScope(file);
+        if (error is null && outOfScope)
         {
             if (file.Origin == FileOrigin.Dependency && _buildScope.GetContentType(file) == ContentType.Resource)
             {

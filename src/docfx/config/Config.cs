@@ -49,23 +49,6 @@ internal class Config : PreloadConfig
     public string[] Exclude { get; init; } = Array.Empty<string>();
 
     /// <summary>
-    /// Gets content build scope config for v2 backward compatibility.
-    /// </summary>
-    [JsonConverter(typeof(OneOrManyConverter))]
-    public FileMappingConfig[] Content { get; init; } = Array.Empty<FileMappingConfig>();
-
-    /// <summary>
-    /// Gets resource build scope config for v2 backward compatibility.
-    /// </summary>
-    [JsonConverter(typeof(OneOrManyConverter))]
-    public FileMappingConfig[] Resource { get; init; } = Array.Empty<FileMappingConfig>();
-
-    /// <summary>
-    /// Gets moniker range group configuration for v2 backward compatibility.
-    /// </summary>
-    public Dictionary<string, GroupConfig> Groups { get; } = new();
-
-    /// <summary>
     /// Gets output file type
     /// </summary>
     public OutputType OutputType { get; init; } = OutputType.Html;

@@ -82,10 +82,14 @@ internal class ServicePageGenerator
             var servicePagePath = pageType == LandingPageType.Root
                 ? FilePath.Generated(new PathString($"./{baseDir}/{directoryName}/index.yml"))
                 : FilePath.Generated(new PathString($"./{baseDir}/{directoryName}/{filename}.yml"));
+
+            // TODO
+            /*
             if (!_buildScope.Contains(servicePagePath.Path))
             {
                 return;
             }
+            */
 
             if (string.IsNullOrEmpty(node.Href.Value))
             {

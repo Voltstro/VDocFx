@@ -318,7 +318,7 @@ internal class MarkdownEngine
             Monikers = link.MarkdownObject.GetZoneLevelMonikers(),
             ZonePivots = link.MarkdownObject.GetZonePivots(),
             TabbedConceptualHeader = link.MarkdownObject.GetTabId(),
-            HostName = _hostName,
+            DefaultHostName = _hostName,
         };
     }
 

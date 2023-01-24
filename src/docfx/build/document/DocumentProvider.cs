@@ -272,7 +272,7 @@ internal class DocumentProvider
 
     private PathString ApplyRoutes(PathString path)
     {
-        (path, _) = _buildScope.MapPath(path);
+        path = _buildScope.MapPath(path);
 
         // TODO: We need to get rid of start path
         if (path.StartsWithPath(new PathString("../"), out var fixedPath))

@@ -12,7 +12,7 @@ internal class MonikerProvider
     private readonly MonikerRangeParser _rangeParser;
     private readonly MetadataProvider _metadataProvider;
 
-    private readonly (Func<string, bool> glob, SourceInfo<string?>)[] _rules;
+    private readonly (Glob, SourceInfo<string?>)[] _rules;
 
     private readonly ConcurrentDictionary<FilePath, SourceInfo<string?>> _configMonikerRangeCache = new();
     private readonly ConcurrentDictionary<FilePath, Watch<(ErrorList, MonikerList, MonikerList)>> _monikerCache = new();
@@ -29,7 +29,7 @@ internal class MonikerProvider
 
         _rangeParser = new(monikerDefinition);
 
-        _rules = _config.MonikerRange.Select(pair => (GlobUtility.CreateGlobMatcher(pair.Key), pair.Value)).Reverse().ToArray();
+        _rules = _config.MonikerRange.Select(pair => (new Glob(new[] { pair.Key }, null), pair.Value)).Reverse().ToArray();
         _monikerOrder = GetMonikerOrder(monikerDefinition);
 
         MonikerDefinitionModel? LoadMonikerDefinition(SourceInfo<string>? src)
@@ -56,12 +56,6 @@ internal class MonikerProvider
 
     public SourceInfo<string?> GetConfigMonikerRange(FilePath file)
     {
-        // Fast pass to get config moniker range if the docset doesn't have any moniker config
-        if (_rules.Length == 0 && _config.Groups.Count == 0 && _config.Content.All(x => x.Version.Value is null))
-        {
-            return default;
-        }
-
         return _configMonikerRangeCache.GetOrAdd(file, GetConfigMonikerRangeCore);
     }
 
@@ -189,23 +183,9 @@ internal class MonikerProvider
 
     private SourceInfo<string?> GetConfigMonikerRangeCore(FilePath file)
     {
-        var (_, mapping) = _buildScope.MapPath(file.Path);
-
-        if (mapping != null)
-        {
-            if (mapping.Version.Value != null)
-            {
-                return mapping.Version;
-            }
-            else if (mapping.Group != null && _config.Groups.TryGetValue(mapping.Group, out var group))
-            {
-                return group.MonikerRange;
-            }
-        }
-
         foreach (var (glob, monikerRange) in _rules)
         {
-            if (glob(file.Path))
+            if (glob.IsMatch(file.Path))
             {
                 return monikerRange;
             }

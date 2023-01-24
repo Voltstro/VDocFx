@@ -44,7 +44,7 @@ internal record CustomRule
 
     public bool ExcludeMatches(string file)
     {
-        var match = LazyInitializer.EnsureInitialized(ref _globMatcherCache, () => GlobUtility.CreateGlobMatcher(Exclude));
+        var match = LazyInitializer.EnsureInitialized(ref _globMatcherCache, () => new Glob(Exclude, null).IsMatch);
 
         return match(file);
     }

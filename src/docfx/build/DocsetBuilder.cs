@@ -213,9 +213,45 @@ internal class DocsetBuilder
     private HashSet<FilePath> GetFilesToBuild(string[]? files)
     {
         HashSet<FilePath> filesToBuild = new();
+
         if (files == null)
         {
             filesToBuild = _publishUrlMap.GetFiles().Concat(_tocMap.GetFiles()).ToHashSet();
+        }
+        else
+        {
+            var globs = new List<Glob>();
+            foreach (var file in files)
+            {
+                if (Glob.IsGlobString(file))
+                {
+                    globs.Add(new Glob(new[] { file }, null));
+                }
+                else
+                {
+                    var filePath = FilePath.Content(new PathString(file));
+                    if (_input.Exists(filePath) && new Glob(_config.Files, _config.Exclude).IsMatch(filePath.Path))
+                    {
+                        filesToBuild.Add(filePath);
+                    }
+                }
+            }
+
+            if (globs.Any())
+            {
+                filesToBuild.UnionWith(from file in _publishUrlMap.GetFiles().Concat(_tocMap.GetFiles())
+                    let fullPath = Path.Combine(_buildOptions.DocsetPath, file.Path)
+                    where globs.Any(glob => glob.IsMatch(fullPath))
+                    select file);
+            }
+        }
+
+        return filesToBuild;
+
+        /*
+        if (files == null)
+        {
+
         }
         else
         {
@@ -224,7 +260,7 @@ internal class DocsetBuilder
             {
                 if (GlobUtility.IsGlobString(file))
                 {
-                    globs.Add(GlobUtility.CreateGlobMatcher(Path.Combine(_buildOptions.DocsetPath, file)));
+                    globs.Add(GlobUtility.CreateGlobMatcher(new[] { Path.Combine(_buildOptions.DocsetPath, file) }));
                 }
                 else
                 {
@@ -245,6 +281,7 @@ internal class DocsetBuilder
             }
         }
         return filesToBuild;
+        */
     }
 
     private void BuildFile(

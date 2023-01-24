@@ -113,10 +113,13 @@ internal class RedirectionProvider
             var path = item.SourcePath;
             var redirectUrl = item.RedirectUrl;
 
+            // TODO
+            /*
             if (!_buildScope.Contains(path))
             {
                 continue;
             }
+            */
 
             var type = _buildScope.GetContentType(path);
             if (type != ContentType.Page)

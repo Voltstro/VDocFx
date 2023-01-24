@@ -22,7 +22,7 @@ internal static class ConfigLoader
 
         return (
             from file in files
-            where glob(file)
+            where glob.IsMatch(file)
             let fullPath = package.GetFullFilePath(file)
             let docsetPath = Path.GetDirectoryName(fullPath)
             let docsetFolder = Path.GetDirectoryName(file)
@@ -233,12 +233,12 @@ internal static class ConfigLoader
         return result;
     }
 
-    private static Func<string, bool>? FindDocsetsGlob(ErrorBuilder errors, Package package, Repository? repository)
+    private static Glob? FindDocsetsGlob(ErrorBuilder errors, Package package, Repository? repository)
     {
         var config = package.TryLoadYamlOrJson<DocsetsConfig>(errors, "docsets");
         if (config != null)
         {
-            return GlobUtility.CreateGlobMatcher(config.Docsets, config.Exclude);
+            return new Glob(config.Docsets, config.Exclude);
         }
 
         return null;

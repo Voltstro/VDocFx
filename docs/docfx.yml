@@ -1,7 +1,11 @@
 template: https://github.com/docascode/template
+files:
+- '**'
+- '../CODE-OF-CONDUCT.md'
 exclude:
 - specs/**
 - designs/**
+- _site/**
 globalMetadata:
   titleSuffix: docfx
   menu_path: /menu.json
