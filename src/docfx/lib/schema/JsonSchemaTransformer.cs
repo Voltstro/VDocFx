@@ -5,7 +5,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using HtmlReaderWriter;
-using Microsoft.Docs.Validation;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Docs.Build;
@@ -448,13 +447,7 @@ internal class JsonSchemaTransformer
         switch (schema.ContentType)
         {
             case JsonSchemaContentType.Href:
-                var (linkErrors, link, _) = _linkResolver.ResolveLink(content, referencingFile, file, new HyperLinkNode
-                {
-                    HyperLinkType = HyperLinkType.Default,
-                    IsVisible = true,  // workaround to skip 'link-text-missing' validation
-                    UrlLink = stringValue,
-                    SourceInfo = sourceInfo,
-                });
+                var (linkErrors, link, _) = _linkResolver.ResolveLink(content, referencingFile, file);
 
                 errors.AddRange(linkErrors);
                 return link;

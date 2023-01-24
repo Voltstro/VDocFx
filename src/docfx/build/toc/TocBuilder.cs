@@ -7,7 +7,6 @@ internal class TocBuilder
 {
     private readonly Config _config;
     private readonly TocLoader _tocLoader;
-    private readonly ContentValidator _contentValidator;
     private readonly MetadataProvider _metadataProvider;
     private readonly MetadataValidator _metadataValidator;
     private readonly DocumentProvider _documentProvider;
@@ -19,7 +18,6 @@ internal class TocBuilder
     public TocBuilder(
         Config config,
         TocLoader tocLoader,
-        ContentValidator contentValidator,
         MetadataProvider metadataProvider,
         MetadataValidator metadataValidator,
         DocumentProvider documentProvider,
@@ -30,7 +28,6 @@ internal class TocBuilder
     {
         _config = config;
         _tocLoader = tocLoader;
-        _contentValidator = contentValidator;
         _metadataProvider = metadataProvider;
         _metadataValidator = metadataValidator;
         _documentProvider = documentProvider;
@@ -45,8 +42,6 @@ internal class TocBuilder
         // load toc tree
         var (node, _, _, _) = _tocLoader.Load(file);
 
-        _contentValidator.ValidateTocDeprecated(file);
-
         var metadata = _metadataProvider.GetMetadata(errors, file);
         _metadataValidator.ValidateMetadata(errors, metadata.RawJObject, file);
 
@@ -57,15 +52,6 @@ internal class TocBuilder
         var model = new TocModel(node.Items.Select(item => item.Value).ToArray(), tocMetadata, path);
 
         var outputPath = _documentProvider.GetOutputPath(file);
-
-        // enable pdf
-        if (!_config.IsReferenceRepository && _config.OutputPdf)
-        {
-            var monikers = _monikerProvider.GetFileLevelMonikers(errors, file);
-            model.Metadata.PdfAbsolutePath = "/" +
-                UrlUtility.Combine(
-                    _config.BasePath, "opbuildpdf", monikers.MonikerGroup ?? "", LegacyUtility.ChangeExtension(path, ".pdf"));
-        }
 
         if (!errors.FileHasError(file) && !_config.DryRun)
         {

@@ -235,16 +235,6 @@ internal class Input
         }
     }
 
-    public IReadOnlyList<FilePath> ListAdditionalFilesFromMain()
-    {
-        var paths = new ListBuilder<FilePath>();
-        Parallel.ForEach(_config.AdditionalFiles, file =>
-        {
-            paths.Add(new FilePath(file));
-        });
-        return paths.AsList();
-    }
-
     public void AddGeneratedContent(FilePath file, JToken content, string? yamlMime)
     {
         Debug.Assert(file.Origin == FileOrigin.Generated);

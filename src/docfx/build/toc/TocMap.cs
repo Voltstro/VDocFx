@@ -20,7 +20,6 @@ internal class TocMap
     private readonly TocParser _tocParser;
     private readonly DocumentProvider _documentProvider;
     private readonly DependencyMapBuilder _dependencyMapBuilder;
-    private readonly ContentValidator _contentValidator;
     private readonly PublishUrlMap _publishUrlMap;
 
     private readonly Watch<(FilePath[] tocs, Dictionary<FilePath, FilePath[]> docToTocs, List<FilePath> servicePages)> _tocs;
@@ -35,7 +34,6 @@ internal class TocMap
         TocParser tocParser,
         TocLoader tocLoader,
         DocumentProvider documentProvider,
-        ContentValidator contentValidator,
         PublishUrlMap publishUrlMap)
     {
         _sourceMap = sourceMap;
@@ -47,7 +45,6 @@ internal class TocMap
         _tocLoader = tocLoader;
         _documentProvider = documentProvider;
         _dependencyMapBuilder = dependencyMapBuilder;
-        _contentValidator = contentValidator;
         _publishUrlMap = publishUrlMap;
         _tocs = new(BuildTocMap);
     }
@@ -89,7 +86,6 @@ internal class TocMap
             _tocs.Value.docToTocs,
             file => file.Path);
 
-        _contentValidator.ValidateTocMissing(file, hasReferencedTocs);
         return toc;
     }
 

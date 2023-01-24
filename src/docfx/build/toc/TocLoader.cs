@@ -4,7 +4,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using Microsoft.Docs.Validation;
 
 namespace Microsoft.Docs.Build;
 
@@ -17,7 +16,6 @@ internal class TocLoader
     private readonly TocParser _parser;
     private readonly MonikerProvider _monikerProvider;
     private readonly DependencyMapBuilder _dependencyMapBuilder;
-    private readonly ContentValidator _contentValidator;
     private readonly ErrorBuilder _errors;
     private readonly IReadOnlyDictionary<string, JoinTOCConfig> _joinTOCConfigs;
     private readonly BuildScope _buildScope;
@@ -36,7 +34,6 @@ internal class TocLoader
         TocParser parser,
         MonikerProvider monikerProvider,
         DependencyMapBuilder dependencyMapBuilder,
-        ContentValidator contentValidator,
         Config config,
         ErrorBuilder errors,
         BuildScope buildScope)
@@ -48,7 +45,6 @@ internal class TocLoader
         _parser = parser;
         _monikerProvider = monikerProvider;
         _dependencyMapBuilder = dependencyMapBuilder;
-        _contentValidator = contentValidator;
         _errors = errors;
         _buildScope = buildScope;
         _joinTOCConfigs = config.JoinTOC.Where(x => x.ReferenceToc != null).ToDictionary(x => PathUtility.Normalize(x.ReferenceToc!));
@@ -190,11 +186,6 @@ internal class TocLoader
 
             // Resolve
             node.Items = LoadTocNodes(node.Items, file, rootPath, referencedFiles, referencedTocs);
-
-            if (file == rootPath)
-            {
-                _contentValidator.ValidateTocEntryDuplicated(file, referencedFiles);
-            }
             return (node, servicePages);
         }
         finally
@@ -261,8 +252,6 @@ internal class TocLoader
         var tocHref = GetTocHref(node);
         var topicHref = GetTopicHref(node);
         var topicUid = node.Value.Uid;
-
-        _contentValidator.ValidateTocBreadcrumbLinkExternal(filePath, node);
 
         var (resolvedTocHref, subChildren, subChildrenFirstItem, tocHrefType) = ProcessTocHref(
             filePath, rootPath, referencedFiles, referencedTocs, tocHref);
@@ -442,13 +431,7 @@ internal class TocLoader
             var topicHrefType = GetHrefType(topicHref);
             Debug.Assert(topicHrefType == TocHrefType.AbsolutePath || !IsTocIncludeHref(topicHrefType));
 
-            var (linkErrors, link, resolvedFile) = _linkResolver.ResolveLink(topicHref!, filePath, rootPath, new HyperLinkNode
-            {
-                HyperLinkType = HyperLinkType.Default,
-                IsVisible = true,  // workaround to skip 'link-text-missing' validation
-                UrlLink = topicHref!.Value!,
-                SourceInfo = topicHref!.Source!,
-            });
+            var (linkErrors, link, resolvedFile) = _linkResolver.ResolveLink(topicHref!, filePath, rootPath);
             _errors.AddRange(linkErrors);
 
             if (resolvedFile != null && addToReferencedFiles)

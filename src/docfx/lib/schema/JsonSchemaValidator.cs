@@ -13,7 +13,6 @@ internal class JsonSchemaValidator
     private readonly bool _forceError;
     private readonly JsonSchema _schema;
     private readonly MonikerProvider? _monikerProvider;
-    private readonly CustomRuleProvider? _customRuleProvider;
 
     private readonly Scoped<ListBuilder<(JsonSchema schema, string key, string moniker, JToken value, SourceInfo? source)>> _metadataBuilder = new();
 
@@ -24,13 +23,11 @@ internal class JsonSchemaValidator
     public JsonSchemaValidator(
         JsonSchema schema,
         MonikerProvider? monikerProvider = null,
-        bool forceError = false,
-        CustomRuleProvider? customRuleProvider = null)
+        bool forceError = false)
     {
         _schema = schema;
         _forceError = forceError;
         _monikerProvider = monikerProvider;
-        _customRuleProvider = customRuleProvider;
     }
 
     public List<Error> Validate(JToken token, FilePath filePath, JsonSchemaMap? schemaMap = null)
@@ -734,15 +731,6 @@ internal class JsonSchemaValidator
             {
                 foreach (var moniker in monikers)
                 {
-                    if (_schema.Rules.TryGetValue(docsetUniqueKey, out var customRules) &&
-                        customRules.TryGetValue("duplicate-attribute", out var customRule) && // code of Errors.DuplicateAttribute
-                        _customRuleProvider != null &&
-                        s_filePath.Value != null &&
-                        !_customRuleProvider.IsEnable(s_filePath.Value, customRule, moniker))
-                    {
-                        continue;
-                    }
-
                     var key = JsonUtility.AddToPropertyPath(propertyPath, docsetUniqueKey);
                     var sourceInfo = JsonUtility.GetSourceInfo(value);
 
@@ -884,16 +872,6 @@ internal class JsonSchemaValidator
         if (_forceError)
         {
             error = error with { Level = ErrorLevel.Error };
-        }
-
-        if (!string.IsNullOrEmpty(error.PropertyPath) &&
-            schema.Rules.TryGetValue(error.PropertyPath, out var attributeCustomRules) && // todo remove schema.Rules to CustomRuleProvider
-            attributeCustomRules.TryGetValue(error.Code, out var customRule))
-        {
-            return CustomRuleProvider.ApplyCustomRule(
-                error,
-                customRule,
-                s_filePath.Value == null ? null : _customRuleProvider?.IsEnable(s_filePath.Value, customRule));
         }
 
         return error;

@@ -15,14 +15,13 @@ internal class MetadataValidator
     public MetadataValidator(
         Config config,
         JsonSchemaLoader jsonSchemaLoader,
-        MonikerProvider monikerProvider,
-        CustomRuleProvider customRuleProvider)
+        MonikerProvider monikerProvider)
     {
         MetadataSchemas = Array.ConvertAll(config.MetadataSchema, jsonSchemaLoader.LoadSchema);
 
         _schemaValidators = Array.ConvertAll(
             MetadataSchemas,
-            schema => new JsonSchemaValidator(schema, monikerProvider, false, customRuleProvider));
+            schema => new JsonSchemaValidator(schema, monikerProvider, false));
 
         _reservedMetadata = JsonUtility.GetPropertyNames(typeof(SystemMetadata))
             .Concat(JsonUtility.GetPropertyNames(typeof(ConceptualModel)))

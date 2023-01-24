@@ -29,13 +29,10 @@ internal class DocsetBuilder
     private readonly ContributionProvider _contributionProvider;
     private readonly RedirectionProvider _redirectionProvider;
     private readonly PublishUrlMap _publishUrlMap;
-    private readonly CustomRuleProvider _customRuleProvider;
     private readonly BookmarkValidator _bookmarkValidator;
     private readonly IProgress<string> _progressReporter;
     private readonly FileLinkMapBuilder _fileLinkMapBuilder;
     private readonly DependencyMapBuilder _dependencyMapBuilder;
-    private readonly ZonePivotProvider _zonePivotProvider;
-    private readonly ContentValidator _contentValidator;
     private readonly XrefResolver _xrefResolver;
     private readonly LinkResolver _linkResolver;
     private readonly MarkdownEngine _markdownEngine;
@@ -77,22 +74,19 @@ internal class DocsetBuilder
         _contributionProvider = _errors.ContributionProvider = new(_config, _buildOptions, _input, _githubAccessor, _repositoryProvider);
         _redirectionProvider = new(_config, _buildOptions, _errors, _buildScope, package, _documentProvider, _monikerProvider, () => Ensure(_publishUrlMap));
         _publishUrlMap = new(_config, _errors, _buildScope, _redirectionProvider, _documentProvider, _monikerProvider);
-        _customRuleProvider = _errors.CustomRuleProvider = new(_config, _errors, _fileResolver, _documentProvider, _publishUrlMap, _monikerProvider, _metadataProvider);
         _bookmarkValidator = new(_errors);
         _fileLinkMapBuilder = new(_errors, _documentProvider, _monikerProvider, _contributionProvider, _config.HostName);
         _dependencyMapBuilder = new(_sourceMap);
         _templateEngine = TemplateEngine.CreateTemplateEngine(_errors, _config, _packageResolver, _buildOptions.Locale, _bookmarkValidator);
-        _zonePivotProvider = new(_errors, _documentProvider, _metadataProvider, _input, _publishUrlMap, () => Ensure(_contentValidator));
-        _contentValidator = new(_config, _fileResolver, _errors, _documentProvider, _monikerProvider, _zonePivotProvider, _metadataProvider, _publishUrlMap);
         _xrefResolver = new(_config, _fileResolver, _buildOptions.Repository, _dependencyMapBuilder, _fileLinkMapBuilder, _errors, _documentProvider, _metadataProvider, _monikerProvider, _buildScope, _repositoryProvider, _input, _redirectionProvider, () => Ensure(_jsonSchemaTransformer));
-        _linkResolver = new(_config, _buildOptions, _buildScope, _redirectionProvider, _documentProvider, _bookmarkValidator, _dependencyMapBuilder, _xrefResolver, _templateEngine, _fileLinkMapBuilder, _metadataProvider, _contentValidator);
+        _linkResolver = new(_config, _buildOptions, _buildScope, _redirectionProvider, _documentProvider, _bookmarkValidator, _dependencyMapBuilder, _xrefResolver, _templateEngine, _fileLinkMapBuilder, _metadataProvider);
         _htmlSanitizer = new(_config);
-        _markdownEngine = new(_input, _linkResolver, _xrefResolver, _documentProvider, _monikerProvider, _templateEngine, _contentValidator, _publishUrlMap, _htmlSanitizer, _config.HostName);
+        _markdownEngine = new(_input, _linkResolver, _xrefResolver, _documentProvider, _monikerProvider, _templateEngine, _publishUrlMap, _htmlSanitizer, _config.HostName);
         _jsonSchemaTransformer = new(_documentProvider, _markdownEngine, _linkResolver, _xrefResolver, _errors, _monikerProvider, _jsonSchemaProvider, _input);
-        _metadataValidator = new MetadataValidator(_config, _jsonSchemaLoader, _monikerProvider, _customRuleProvider);
+        _metadataValidator = new MetadataValidator(_config, _jsonSchemaLoader, _monikerProvider);
         _tocParser = new(_input, _markdownEngine);
-        _tocLoader = new(_buildOptions, _input, _linkResolver, _xrefResolver, _tocParser, _monikerProvider, _dependencyMapBuilder, _contentValidator, _config, _errors, _buildScope);
-        _tocMap = new(_sourceMap, _config, _errors, _input, _buildScope, _dependencyMapBuilder, _tocParser, _tocLoader, _documentProvider, _contentValidator, _publishUrlMap);
+        _tocLoader = new(_buildOptions, _input, _linkResolver, _xrefResolver, _tocParser, _monikerProvider, _dependencyMapBuilder, _config, _errors, _buildScope);
+        _tocMap = new(_sourceMap, _config, _errors, _input, _buildScope, _dependencyMapBuilder, _tocParser, _tocLoader, _documentProvider, _publishUrlMap);
     }
 
     public static DocsetBuilder? Create(
@@ -151,21 +145,20 @@ internal class DocsetBuilder
             var output = new Output(_buildOptions.OutputPath, _input, _config.DryRun);
             var publishModelBuilder = new PublishModelBuilder(_config, _errors, _monikerProvider, _buildOptions, _sourceMap, _documentProvider, _contributionProvider, _buildScope);
             var resourceBuilder = new ResourceBuilder(_input, _documentProvider, _config, output, publishModelBuilder);
-            var pageBuilder = new PageBuilder(_config, _buildOptions, _input, output, _documentProvider, _metadataProvider, _monikerProvider, _publishUrlMap, _templateEngine, _tocMap, _linkResolver, _xrefResolver, _contributionProvider, _bookmarkValidator, publishModelBuilder, _contentValidator, _metadataValidator, _markdownEngine, _redirectionProvider, _jsonSchemaTransformer);
-            var tocBuilder = new TocBuilder(_config, _tocLoader, _contentValidator, _metadataProvider, _metadataValidator, _documentProvider, _monikerProvider, publishModelBuilder, _templateEngine, output);
+            var pageBuilder = new PageBuilder(_config, _buildOptions, _input, output, _documentProvider, _metadataProvider, _monikerProvider, _publishUrlMap, _templateEngine, _tocMap, _linkResolver, _xrefResolver, _contributionProvider, _bookmarkValidator, publishModelBuilder, _metadataValidator, _markdownEngine, _redirectionProvider, _jsonSchemaTransformer);
+            var tocBuilder = new TocBuilder(_config, _tocLoader, _metadataProvider, _metadataValidator, _documentProvider, _monikerProvider, publishModelBuilder, _templateEngine, output);
             var redirectionBuilder = new RedirectionBuilder(publishModelBuilder, _redirectionProvider, _documentProvider);
 
             var filesToBuild = GetFilesToBuild(files);
 
             using (var scope = Progress.Start($"Building {filesToBuild.Count} files"))
             {
-                ParallelUtility.ForEach(scope, _errors, filesToBuild, file => BuildFile(file, _contentValidator, resourceBuilder, pageBuilder, tocBuilder, redirectionBuilder));
+                ParallelUtility.ForEach(scope, _errors, filesToBuild, file => BuildFile(file, resourceBuilder, pageBuilder, tocBuilder, redirectionBuilder));
                 ParallelUtility.ForEach(scope, _errors, _linkResolver.GetAdditionalResources(), file => resourceBuilder.Build(file));
             }
 
             Parallel.Invoke(
                 () => _bookmarkValidator.Validate(),
-                () => _contentValidator.PostValidate(),
                 () => _errors.AddRange(_metadataValidator.PostValidate()),
                 () => _contributionProvider.Save(),
                 () => _repositoryProvider.Save(),
@@ -247,54 +240,16 @@ internal class DocsetBuilder
         }
 
         return filesToBuild;
-
-        /*
-        if (files == null)
-        {
-
-        }
-        else
-        {
-            var globs = new List<Func<string, bool>>();
-            foreach (var file in files)
-            {
-                if (GlobUtility.IsGlobString(file))
-                {
-                    globs.Add(GlobUtility.CreateGlobMatcher(new[] { Path.Combine(_buildOptions.DocsetPath, file) }));
-                }
-                else
-                {
-                    var filePath = FilePath.Content(new PathString(file));
-                    if (_input.Exists(filePath) && _buildScope.Contains(filePath.Path))
-                    {
-                        filesToBuild.Add(filePath);
-                    }
-                }
-            }
-
-            if (globs.Any())
-            {
-                filesToBuild.UnionWith(from file in _publishUrlMap.GetFiles().Concat(_tocMap.GetFiles())
-                                       let fullPath = Path.Combine(_buildOptions.DocsetPath, file.Path)
-                                       where globs.Any(glob => glob.Invoke(fullPath))
-                                       select file);
-            }
-        }
-        return filesToBuild;
-        */
     }
 
     private void BuildFile(
         FilePath file,
-        ContentValidator contentValidator,
         ResourceBuilder resourceBuilder,
         PageBuilder pageBuilder,
         TocBuilder tocBuilder,
         RedirectionBuilder redirectionBuilder)
     {
         var contentType = _documentProvider.GetContentType(file);
-
-        contentValidator.ValidateManifest(file);
 
         switch (contentType)
         {

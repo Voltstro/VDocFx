@@ -24,7 +24,6 @@ internal class PageBuilder
     private readonly ContributionProvider _contributionProvider;
     private readonly BookmarkValidator _bookmarkValidator;
     private readonly PublishModelBuilder _publishModelBuilder;
-    private readonly ContentValidator _contentValidator;
     private readonly MetadataValidator _metadataValidator;
     private readonly MarkdownEngine _markdownEngine;
     private readonly RedirectionProvider _redirectionProvider;
@@ -46,7 +45,6 @@ internal class PageBuilder
         ContributionProvider contributionProvider,
         BookmarkValidator bookmarkValidator,
         PublishModelBuilder publishModelBuilder,
-        ContentValidator contentValidator,
         MetadataValidator metadataValidator,
         MarkdownEngine markdownEngine,
         RedirectionProvider redirectionProvider,
@@ -67,7 +65,6 @@ internal class PageBuilder
         _contributionProvider = contributionProvider;
         _bookmarkValidator = bookmarkValidator;
         _publishModelBuilder = publishModelBuilder;
-        _contentValidator = contentValidator;
         _metadataValidator = metadataValidator;
         _markdownEngine = markdownEngine;
         _redirectionProvider = redirectionProvider;
@@ -254,12 +251,6 @@ internal class PageBuilder
         systemMetadata.Author = systemMetadata.ContributionInfo?.Author?.Name;
         systemMetadata.UpdatedAt = systemMetadata.ContributionInfo?.UpdatedAtDateTime.ToString("yyyy-MM-dd hh:mm tt");
 
-        if (!_config.IsReferenceRepository && _config.OutputPdf)
-        {
-            systemMetadata.PdfUrlPrefixTemplate = UrlUtility.Combine(
-                $"https://{_config.HostName}", "pdfstore", systemMetadata.Locale, $"{_config.Product}.{_config.Name}", "{branchName}");
-        }
-
         return systemMetadata;
     }
 
@@ -289,16 +280,12 @@ internal class PageBuilder
         var content = _input.ReadString(file);
         errors.AddIfNotNull(MergeConflict.CheckMergeConflictMarker(content, file));
 
-        _contentValidator.ValidateSensitiveLanguage(file, content);
-
         var userMetadata = _metadataProvider.GetMetadata(errors, file);
 
         _metadataValidator.ValidateMetadata(errors, userMetadata.RawJObject, file);
 
         var conceptual = new ConceptualModel { Title = userMetadata.Title };
         var html = _markdownEngine.ToHtml(errors, content, new SourceInfo(file), MarkdownPipelineType.Markdown, conceptual);
-
-        _contentValidator.ValidateTitle(file, conceptual.Title, userMetadata.TitleSuffix);
 
         ProcessConceptualHtml(file, html, conceptual);
 

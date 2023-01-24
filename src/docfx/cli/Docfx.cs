@@ -129,7 +129,6 @@ public static class Docfx
                         options.StdinConfig = JsonUtility.DeserializeData<JObject>(stdin, new FilePath("--stdin"));
                     }
                     Log.Write($"docfx: {GetDocfxVersion()}");
-                    Log.Write($"Microsoft.Docs.Validation: {GetVersion(typeof(Validation.IValidator))}");
                     Log.Write($"ECMA2Yaml: {GetVersion(typeof(ECMA2Yaml.ECMA2YamlConverter))}");
 
                     return run(options) ? 1 : 0;

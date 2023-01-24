@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Concurrent;
-using Microsoft.Docs.Validation;
 
 namespace Microsoft.Docs.Build;
 
@@ -19,7 +18,6 @@ internal class LinkResolver
     private readonly TemplateEngine _templateEngine;
     private readonly FileLinkMapBuilder _fileLinkMapBuilder;
     private readonly MetadataProvider _metadataProvider;
-    private readonly ContentValidator _contentValidator;
 
     private readonly Scoped<ConcurrentHashSet<FilePath>> _additionalResources = new();
 
@@ -34,8 +32,7 @@ internal class LinkResolver
         XrefResolver xrefResolver,
         TemplateEngine templateEngine,
         FileLinkMapBuilder fileLinkMapBuilder,
-        MetadataProvider metadataProvider,
-        ContentValidator contentValidator)
+        MetadataProvider metadataProvider)
     {
         _config = config;
         _buildOptions = buildOptions;
@@ -48,7 +45,6 @@ internal class LinkResolver
         _templateEngine = templateEngine;
         _fileLinkMapBuilder = fileLinkMapBuilder;
         _metadataProvider = metadataProvider;
-        _contentValidator = contentValidator;
     }
 
     public (Error? error, FilePath? file) ResolveContent(
@@ -75,7 +71,7 @@ internal class LinkResolver
     }
 
     public (List<Error> errors, string link, FilePath? file) ResolveLink(
-        SourceInfo<string> href, FilePath referencingFile, FilePath inclusionRoot, LinkNode? linkNode = null, string tagName = "a")
+        SourceInfo<string> href, FilePath referencingFile, FilePath inclusionRoot, string tagName = "a")
     {
         var errors = new List<Error>();
         if (href.Value.StartsWith("xref:"))
@@ -93,7 +89,6 @@ internal class LinkResolver
             href,
             referencingFile,
             inclusionRoot,
-            linkNode,
             tagName);
 
         inclusionRoot ??= referencingFile;
@@ -127,7 +122,7 @@ internal class LinkResolver
     public IEnumerable<FilePath> GetAdditionalResources() => _additionalResources.Value;
 
     private (List<Error> error, string href, string? fragment, LinkType linkType, FilePath? file, bool isCrossReference) TryResolveAbsoluteLink(
-        SourceInfo<string> href, FilePath hrefRelativeTo, FilePath inclusionRoot, LinkNode? linkNode, string tagName)
+        SourceInfo<string> href, FilePath hrefRelativeTo, FilePath inclusionRoot, string tagName)
     {
         var errors = new List<Error>();
         var decodedHref = new SourceInfo<string>(Uri.UnescapeDataString(href), href);
@@ -138,11 +133,6 @@ internal class LinkResolver
         {
             return (errors, "", fragment, linkType, null, false);
         }
-
-        ValidateLink(
-            inclusionRoot,
-            linkNode,
-            !IsPublicContributor() && (linkType == LinkType.External || linkType == LinkType.AbsolutePath));
 
         if (linkType == LinkType.External)
         {
@@ -349,16 +339,6 @@ internal class LinkResolver
         }
 
         return default;
-    }
-
-    private void ValidateLink(FilePath file, LinkNode? node, bool validate404)
-    {
-        if (node is null)
-        {
-            return;
-        }
-
-        _contentValidator.ValidateLink(file, node, validate404);
     }
 
     private static bool IsPublicContributor()

@@ -12,7 +12,6 @@ using Markdig.Renderers.Html.Inlines;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Microsoft.Docs.MarkdigExtensions;
-using Microsoft.Docs.Validation;
 
 namespace Microsoft.Docs.Build;
 
@@ -24,7 +23,6 @@ internal class MarkdownEngine
     private readonly Input _input;
     private readonly MonikerProvider _monikerProvider;
     private readonly TemplateEngine _templateEngine;
-    private readonly ContentValidator _contentValidator;
 
     private readonly MarkdownContext _markdownContext;
     private readonly MarkdownPipeline[] _pipelines;
@@ -43,7 +41,6 @@ internal class MarkdownEngine
         DocumentProvider documentProvider,
         MonikerProvider monikerProvider,
         TemplateEngine templateEngine,
-        ContentValidator contentValidator,
         PublishUrlMap publishUrlMap,
         HtmlSanitizer htmlSanitizer,
         string hostName)
@@ -54,7 +51,6 @@ internal class MarkdownEngine
         _documentProvider = documentProvider;
         _monikerProvider = monikerProvider;
         _templateEngine = templateEngine;
-        _contentValidator = contentValidator;
         _publishUrlMap = publishUrlMap;
         _htmlSanitizer = htmlSanitizer;
         _hostName = hostName;
@@ -198,7 +194,6 @@ internal class MarkdownEngine
             .UseExpandInclude(_markdownContext, GetErrors)
 
             // Extensions after this line sees an expanded inclusion AST only once.
-            .UseDocsValidation(this, _contentValidator, GetFileLevelMonikers, GetCanonicalVersion)
             .UseResolveLink(_markdownContext)
             .UseXref(GetXref)
             .UseHtml(GetErrors, GetLink, GetXref, _htmlSanitizer, _documentProvider)
@@ -285,43 +280,6 @@ internal class MarkdownEngine
         return s_status.Value!.Peek().Conceptual;
     }
 
-    private LinkNode? TransformLinkInfo(LinkInfo link)
-    {
-        if (link.MarkdownObject is null)
-        {
-            return null;
-        }
-
-        LinkNode node = link.IsImage
-        ? new ImageLinkNode
-        {
-            ImageLinkType = Enum.TryParse(link.ImageType, true, out ImageLinkType type) ? type : ImageLinkType.Default,
-            AltText = link.AltText,
-            IsInline = link.MarkdownObject.IsInlineImage(link.HtmlSourceIndex),
-        }
-        : new HyperLinkNode
-        {
-            IsVisible = MarkdigUtility.IsVisible(link.MarkdownObject),
-            HyperLinkType = link.MarkdownObject switch
-            {
-                AutolinkInline => HyperLinkType.AutoLink,
-                HtmlBlock or HtmlInline or TripleColonInline or TripleColonBlock => HyperLinkType.HtmlAnchor,
-                _ => HyperLinkType.Default,
-            },
-        };
-
-        return node with
-        {
-            UrlLink = link.Href,
-            SourceInfo = link.Href.Source,
-            ParentSourceInfoList = link.MarkdownObject.GetInclusionStack(),
-            Monikers = link.MarkdownObject.GetZoneLevelMonikers(),
-            ZonePivots = link.MarkdownObject.GetZonePivots(),
-            TabbedConceptualHeader = link.MarkdownObject.GetTabId(),
-            DefaultHostName = _hostName,
-        };
-    }
-
     private (string? content, object? file) ReadFile(string path, MarkdownObject origin, bool? contentFallback = null)
     {
         var status = s_status.Value!.Peek();
@@ -361,7 +319,7 @@ internal class MarkdownEngine
     {
         var status = s_status.Value!.Peek();
         var (linkErrors, result, _) =
-            _linkResolver.ResolveLink(link.Href, GetFilePath(link.Href), GetRootFilePath(), TransformLinkInfo(link), tagName: link.TagName);
+            _linkResolver.ResolveLink(link.Href, GetFilePath(link.Href), GetRootFilePath(), tagName: link.TagName);
         status.Errors.AddRange(linkErrors);
         return result;
     }

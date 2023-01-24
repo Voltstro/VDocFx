@@ -19,8 +19,6 @@ internal class ErrorLog : ErrorBuilder
 
     public MetadataProvider? MetadataProvider { get; set; }
 
-    public CustomRuleProvider? CustomRuleProvider { get; set; }
-
     public ContributionProvider? ContributionProvider { get; set; }
 
     public override bool HasError => _errorSink.Value.ErrorCount > 0 || _fileSink.Value.Values.Any(file => file.ErrorCount > 0);
@@ -69,9 +67,7 @@ internal class ErrorLog : ErrorBuilder
             {
             }
         }
-
-        error = CustomRuleProvider?.ApplyCustomRule(error) ?? error;
-
+        
         if (error.Level == ErrorLevel.Off)
         {
             return;

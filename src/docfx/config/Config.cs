@@ -37,28 +37,15 @@ internal class Config : PreloadConfig
     public string[] Files { get; init; } = DefaultInclude;
 
     /// <summary>
-    /// Other additional files to include
-    /// </summary>
-    [JsonConverter(typeof(OneOrManyConverter))]
-    public string[] AdditionalFiles { get; init; } = Array.Empty<string>();
-
-    /// <summary>
     /// Gets the file glob patterns excluded from this docset.
     /// </summary>
     [JsonConverter(typeof(OneOrManyConverter))]
-    public string[] Exclude { get; init; } = Array.Empty<string>();
+    public string[] Exclude { get; init; } = DefaultExclude;
 
     /// <summary>
     /// Gets output file type
     /// </summary>
     public OutputType OutputType { get; init; } = OutputType.Html;
-
-    /// <summary>
-    /// For backward compatibility.
-    /// Gets whether to generate `_op_pdfUrlPrefixTemplate` property in legacy metadata conversion.
-    /// Front-end will display `Download PDF` link if `_op_pdfUrlPrefixTemplate` property is set.
-    /// </summary>
-    public bool OutputPdf { get; init; }
 
     /// <summary>
     /// Gets whether the repository a reference repository.
@@ -171,11 +158,6 @@ internal class Config : PreloadConfig
     public SourceInfo<string> DocumentIdOverride { get; init; } = new("");
 
     /// <summary>
-    /// Gets allow custom error code, severity and message.
-    /// </summary>
-    public Dictionary<string, SourceInfo<CustomRule>> Rules { get; } = new();
-
-    /// <summary>
     /// Gets a map from error code to document URL.
     /// </summary>
     public Dictionary<string, string> DocumentUrls { get; } = new();
@@ -225,21 +207,6 @@ internal class Config : PreloadConfig
     /// </summary>
     [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
     public Dictionary<string, HashSet<string>?> AllowedHtml { get; init; } = HtmlSanitizer.DefaultAllowedHtml;
-
-    /// <summary>
-    /// Get the file path of content validation rules
-    /// </summary>
-    public SourceInfo<string> MarkdownValidationRules { get; init; } = new("");
-
-    /// <summary>
-    /// Get the file path of Azure SandboxEnabledModuleList
-    /// </summary>
-    public SourceInfo<string> SandboxEnabledModuleList { get; private set; } = new("");
-
-    /// <summary>
-    /// Get the file path of build validation rules
-    /// </summary>
-    public SourceInfo<string> BuildValidationRules { get; init; } = new("");
 
     /// <summary>
     /// Get the file path of allow lists
@@ -354,10 +321,7 @@ internal class Config : PreloadConfig
             yield return MonikerDefinition.src.Value;
         }
 
-        yield return MarkdownValidationRules;
-        yield return BuildValidationRules;
         yield return Allowlists;
-        yield return SandboxEnabledModuleList;
 
         foreach (var metadataSchema in MetadataSchema)
         {
