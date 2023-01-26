@@ -1,0 +1,15 @@
+<div class="container-xxl">
+  <div class="row">
+    {%- if page._appFooterIcon -%}
+    <div class="col-md-auto mb-3 mb-lg-0">
+      <img src="{{ page._rel }}{{ page._appFooterIcon }}" alt="Footer Icon" />
+    </div>
+    {%- endif -%}
+
+    {%- if page._appFooter -%}
+    <div class="col-md-auto">
+      <span>{{ page._appFooter }}</span>
+    </div>
+    {%- endif -%}
+  </div>
+</div>

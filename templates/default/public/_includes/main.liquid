@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {{metadata}}
+
+  {%- if page.title == null -%}
+    <title>{{ page._appTitle }}</title>
+  {%- else -%}  
+    <title>{{ page.title }} | {{ page._appTitle }}</title>
+  {%- endif -%}
+
+  <link rel="icon" type="image/x-icon" href="{{ page._rel }}favicon.ico">
+  <link rel="stylesheet" href="{{ page._rel }}dist/main.css">
+</head>
+
+<body>
+  <header>
+    {%- include header -%}
+  </header>
+
+  <main class="container-xxl layout-{{layout}} page-type-{{pageType}}">
+    {%- if layout == "conceptual" -%}
+      {%- unless disableBreadcrumb -%}
+        <nav class="layout-breadcrumb" id="breadcrumb" aria-label="breadcrumb"></nav>
+      {%- endunless -%}
+
+      {%- unless page.disableToc -%}
+        <nav class="layout-toc">
+          {%- include toc -%}
+        </nav>
+      {%- endunless -%}
+
+      <article>
+        {{ heading1 }}
+        {%- unless page.disableMetabar or disableMetabar -%}
+          {%- include metabar -%}
+        {%- endunless -%}
+
+        {{ content }}
+      </article>
+
+      <aside>
+        <div class="sticky-top">
+          {%- unless disableContribution -%}
+          <a class="nav edit-this-page" href="{{ page.original_content_git_url }}">Improve this Doc</a>
+          {%- endunless -%}
+
+          <nav id="in-this-article" class="in-this-article"></nav>
+        </div>
+      </aside>
+    {%- else -%}
+      {{ content }}
+    {%- endif -%}
+  </main>
+
+  <footer>
+    {%- include footer -%}
+  </footer>
+
+  <script type="text/javascript" src="{{ page._rel }}dist/docfx.js"></script>
+</body>
+
+</html>

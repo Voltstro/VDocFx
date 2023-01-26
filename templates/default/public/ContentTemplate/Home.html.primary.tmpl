@@ -1,0 +1,44 @@
+{{#hero}}
+<div class="hero container-xxl">
+  <div class="hero-content">
+    <h1>{{title}}</h1>
+    <div class="lead">{{{description}}}</div>
+    <div class="actions">
+      {{#actions}}
+        {{#first}}
+        <a href="{{href}}" class="btn btn-primary btn-lg">{{name}}</a>
+        {{/first}}
+        {{^first}}
+        <a href="{{href}}" class="btn btn-outline-secondary btn-lg">{{name}}</a>
+        {{/first}}
+      {{/actions}}
+    </div>
+  </div>
+</div>
+{{/hero}}
+
+{{#quickstart}}
+<div class="quickstart container-xxl">
+  <section>
+    <h2>{{title}}</h2>
+    <div class="content">
+      {{{content}}}
+    </div>
+  </section>
+</div>
+{{/quickstart}}
+
+{{#highlights.0}}
+<div class="container-xxl">
+  <div class="highlights">
+{{/highlights.0}}
+    {{#highlights}}
+    <section>
+      <h2>{{title}}</h2>
+      <div class="content">{{{content}}}</div>
+    </section>
+    {{/highlights}}
+{{#highlights.0}}
+  </div>
+</div>
+{{/highlights.0}}

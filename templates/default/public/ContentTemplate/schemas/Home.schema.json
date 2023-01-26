@@ -1,0 +1,71 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema##",
+    "description": "The schema for home page",
+    "type": "object",
+    "properties": {
+        "hero": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string",
+                    "contentType": "markdown"
+                },
+                "image": {
+                    "type": "string",
+                    "contentType": "href"
+                },
+                "backgroundImage": {
+                    "type": "string",
+                    "contentType": "href"
+                },
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "href": {
+                                "type": "string",
+                                "contentType": "href"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "highlights": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string",
+                        "contentType": "markdown"
+                    }
+                }
+            }
+        },
+        "quickstart": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string",
+                        "contentType": "markdown"
+                    }
+                }
+            }
+        }
+    }
+}

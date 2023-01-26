@@ -1,0 +1,90 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+/* Form Controls */
+.form-control, .form-control:focus {
+  color: var(--bs-body-color);
+  background-color: var(--detail-second-color-bg);
+}
+
+/* TOC panel appearance */
+.layout-toc {
+  .navbar-toggler {
+    font-size: inherit;
+    cursor: pointer;
+
+    &:before {
+      content: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280,0,0,.5%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e")
+    }
+  }
+
+  .navbar-collapse {
+    margin-top: .5em;
+  }
+
+  input {
+    font-size: 14px;
+  }
+}
+
+/* TOC appearance */
+.toc {
+  font-size: 14px;
+
+  a:not(.active):not(.filtered) {
+    color: inherit
+  }
+  a:not([href]) {
+    &,
+    &:hover {
+      cursor: pointer;
+      text-decoration: none;
+    }
+  }
+  ul {
+    padding-left: 16px;
+    list-style-type: none;
+  }
+  li {
+    padding: .25em 0;
+  }
+}
+
+/* TOC item toggle */
+.toc {
+  padding: .5em 0;
+
+  li > ul {
+    display: none;
+  }
+  li.filtered > ul,
+  li.active > ul {
+    display: block
+  }
+
+  .toggle::before {
+    display: inline-block;
+    margin: 0 0 0 -1.25em;
+    cursor: pointer;
+    width: 1.25em;
+    transition: transform 0.35s ease;
+    transform-origin: .5em 50%;
+  }
+
+  .toggle > svg {
+    stroke: rgba(255, 255, 255, 1);
+  }
+
+  .active > .toggle > svg {
+    transform: rotate(90deg);
+  }
+
+  li.active > .toggle:before > svg,
+  li.filtered > .toggle::before > svg {
+    transform: rotate(90deg);
+  }
+
+  .hide {
+    display: none;
+  }
+}

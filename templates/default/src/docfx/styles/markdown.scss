@@ -1,0 +1,141 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+/* base */
+:not(a):not(pre)>code {
+  background-color: var(--detail-second-color-bg);
+  padding: .2em .4em;
+}
+
+code,
+pre {
+  border-radius: $border-radius
+}
+
+.hljs {
+  background-color: var(--detail-second-color-bg);
+}
+
+/* Alerts */
+.alert {
+  border-radius: $border-radius;
+  border-width: 0;
+  color: black;
+
+  h5 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 0;
+  }
+
+  h5:before {
+    position: relative;
+    top: .2em;
+    width: 1.25em;
+    display: inline-block;
+    padding-top: 4px;
+    margin-right: .25em;
+  }
+
+  &.NOTE {
+    background-color: rgb(158, 96, 240);
+    h5:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 448'%3E%3Cpath d='M208 448C93.313 448 0 354.688 0 240S93.313 32 208 32s208 93.313 208 208-93.312 208-208 208zm0-384c-97.047 0-176 78.953-176 176 0 97.031 78.953 176 176 176 97.031 0 176-78.969 176-176 0-97.047-78.969-176-176-176zm16 64h-32v160h32V128zm0 192h-32v32h32v-32z'/%3E%3C/svg%3E");
+    }
+  }
+
+  &.TIP {
+    background-color: rgb(171, 228, 118);
+    h5:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2048 2048'%3E%3Cpath d='M960 0q97 0 187 25t168 71 143 110 110 142 71 169 25 187q0 145-55 269t-157 225q-83 82-127 183t-45 219v256q0 40-15 75t-41 61-61 41-75 15H832q-40 0-75-15t-61-41-41-61-15-75v-256q0-118-44-219t-128-183q-102-101-157-225t-55-269q0-97 25-187t71-168 110-143T604 96t169-71T960 0zm128 1920q26 0 45-19t19-45v-192H768v192q0 26 19 45t45 19h256zm67-384q13-129 66-234t143-196q83-84 127-183t45-219q0-119-45-224t-124-183-183-123-224-46q-119 0-224 45T553 297 430 480t-46 224q0 119 44 218t128 184q90 91 143 196t66 234h390z'/%3E%3C/svg%3E");
+    }
+  }
+
+  &.WARNING {
+    background-color: rgb(247, 178, 73);
+    h5:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 448'%3E%3Cpath d='M413.031 448H2.953L208 36.094 413.031 448zm-358.39-32h306.703L208 107.906 54.641 416zM224 192h-32v128h32V192zm0 160h-32v32h32v-32z'/%3E%3C/svg%3E");
+    }
+  }
+
+  &.IMPORTANT {
+    background-color: rgb(71, 155, 216);
+    h5:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 448'%3E%3Cpath d='M208 448C93.313 448 0 354.688 0 240S93.313 32 208 32s208 93.313 208 208-93.312 208-208 208zm0-384c-97.047 0-176 78.953-176 176 0 97.031 78.953 176 176 176 97.031 0 176-78.969 176-176 0-97.047-78.969-176-176-176zm16 64h-32v32h32v-32zm0 64h-32v160h32V192z'/%3E%3C/svg%3E");
+    }
+  }
+
+  &.CAUTION {
+    background-color: rgb(214, 69, 69);
+    h5:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 448'%3E%3Cpath d='M208 32C93.313 32 0 125.313 0 240s93.313 208 208 208 208-93.313 208-208S322.688 32 208 32zm0 384c-97.047 0-176-78.969-176-176 0-97.047 78.953-176 176-176 97.031 0 176 78.953 176 176 0 97.031-78.969 176-176 176zm107.313-260.687L230.625 240l84.688 84.688-22.625 22.625L208 262.625l-84.688 84.688-22.625-22.625L185.375 240l-84.688-84.688 22.625-22.625L208 217.375l84.688-84.688 22.625 22.626z'/%3E%3C/svg%3E");
+    }
+  }
+}
+
+/* For tabbed content */
+.tabGroup {
+  margin-top: 1rem;
+
+  ul[role="tablist"] {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    & > li {
+      list-style: none;
+      display: inline-block;
+    }
+  }
+
+  a[role="tab"] {
+    color: #6e6e6e;
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 5px 7.5px;
+    text-decoration: none;
+    border-bottom: 3px solid #fff;
+  }
+}
+
+.tabGroup a[role="tab"]:hover,
+.tabGroup a[role="tab"]:focus,
+.tabGroup a[role="tab"][aria-selected="true"] {
+  border-bottom: 3px solid $primary;
+}
+.tabGroup a[role="tab"][aria-selected="true"] {
+  color: #222;
+}
+.tabGroup a[role="tab"]:hover, .tabGroup a[role="tab"]:focus {
+  color: $primary;
+}
+.tabGroup a[role="tab"]:focus {
+  outline: 3px solid $primary;
+  outline-offset: -3px;
+}
+@media (min-width: 768px) {
+  .tabGroup a[role="tab"] {
+    padding: 5px 15px;
+  }
+}
+
+.tabGroup section[role="tabpanel"] {
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  margin: 0;
+  overflow: hidden;
+
+  & > .codeHeader,
+  & > pre {
+    margin-left: -16px;
+    margin-right: -16px;
+  }
+  & > :first-child {
+    margin-top: 0;
+  }
+  & > pre:last-child {
+    display: block;
+    margin-bottom: -16px;
+  }
+}

@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-md navbar-dark">
+  <div class="container-xxl">
+    {%- if page._appLogoClickUrl -%}
+      {%- assign headerLogoUrl = page._appLogoClickUrl -%}
+    {%- else -%}
+            {%- assign headerLogoUrl = page._rel -%}
+    {%- endif -%}
+    <a class="navbar-brand" href="{{ headerLogoUrl }}">
+        {%- if page._appLogoPath -%}
+        <img src="{{ page._appLogoPath }}">
+        {%- endif -%}
+        {%- if page._appTitle -%}
+        {{ page._appTitle }}
+        {%- endif -%}
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar"></div>
+  </div>
+</nav>

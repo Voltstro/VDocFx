@@ -1,0 +1,43 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+/* metabar */
+.metabar {
+  color: #999;
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  align-items: center;
+}
+
+.metabar > li {
+  margin: 0 6px;
+}
+
+.contributors {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+
+  & > li {
+    margin: 0 4px;
+  }
+
+  img {
+    border-radius: 50%;
+  }
+}
+
+/* Edit this page */
+.edit-this-page {
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out;
+  color: var(--bs-nav-link-color);
+  padding-bottom: 1em;
+
+  @media print {
+    display: none;
+  }
+}

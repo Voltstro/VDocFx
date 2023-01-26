@@ -1,0 +1,86 @@
+// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+.pdl>svg {
+  fill: rgba(255, 255, 255, 1);
+  top: .2em;
+  left: .2em;
+  display: inline-block;
+  width: 1em;
+  margin: 0 .25em;
+}
+
+main.page-type-reference {
+  .is-hidden {
+    display: none;
+  }
+
+  details {
+    display: none;
+  }
+
+  h2.appliesTo,
+  h3.appliesTo {
+    display: none;
+  }
+
+  dl.attributeList {
+    display: flex;
+    margin: .25em 0;
+    font-weight: 400;
+
+    dt {
+      font-weight: 400;
+    }
+
+    dd {
+      margin-left: 8px;
+    }
+  }
+
+  .stack {
+    margin-top: 24px;
+  }
+
+  .metadata {
+    margin: 1em 0;
+    color: rgb(120, 120, 120);
+    dl.attributeList {
+      font-size: 14px;
+    }
+  }
+
+  .propertyInfoTitle {
+    font-size: 24px;
+    font-weight: 400;
+  }
+
+  .cdlHolder .cdl,
+  .pdlHolder .pdl {
+    display: inline-block;
+  }
+
+  .cdlHolder .cdl:after {
+    content: ', ';
+    color: rgb(80, 80, 80);
+  }
+  
+  .cdlHolder .cdl:last-child:after,
+  .pdlHolder .pdl:last-child:after {
+    content: '';
+  }
+
+  .memberInfo {
+    margin-left: 24px;
+  }
+
+  .parameterList {
+    display: flex;
+    margin: 0;
+
+    dt {
+      background-color: var(--detail-second-color-bg);
+      padding: 0 6px 2px 6px;
+      margin-right: 1em;
+    }
+  }
+}

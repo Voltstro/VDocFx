@@ -1,0 +1,22 @@
+{
+  "name": "volt-docfxv3-theme",
+  "license": "MIT",
+  "version": "0.0.0",
+  "scripts": {
+    "build:dev": "tsc && vite build --mode development",
+    "build": "tsc -b && vite build"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "sass": "^1.57.1",
+    "terser": "^5.16.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4"
+  },
+  "dependencies": {
+    "anchor-js": "^5.0.0",
+    "bootstrap": "^5.2.3",
+    "highlight.js": "^11.7.0",
+    "jsx-dom": "^8.0.4"
+  }
+}
