@@ -1,28 +1,25 @@
-// Copyright (c) Microsoft. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-:root {
-  --navbar-bg-color: #164268;
-}
-
-$primary: #2d74b2 !default;
-$link-decoration: none !default;
-$link-hover-decoration: underline !default;
+//Bootstrap override
+$grid-breakpoints: (
+        xs: 0,
+        sm: 580px,
+        md: 760px,
+        lg: 1100px,
+        xl: 1400px,
+        xxl: 1900px
+) !default;
 $container-max-widths: (
-  xxl: 1768px
+        sm: 100%,
+        md: 100%,
+        lg: 1200px,
+        xl: 1300px,
+        xxl: 1800px
 ) !default;
 
 @import 'bootstrap/scss/bootstrap.scss';
 @import 'highlight.js/styles/github-dark.css';
-@import './styles/layout.scss';
-@import './styles/article.scss';
-@import './styles/markdown.scss';
-@import './styles/home.scss';
-@import './styles/nav.scss';
-@import './styles/toc.scss';
-@import './styles/dotnet.scss';
 
-.container.page-type-home {
-  padding: 0;
-}
-
+@import 'styles/layout.scss';
+@import 'styles/home.scss';
+@import 'styles/article.scss';
+@import 'styles/nav.scss';
+@import 'styles/toc.scss';

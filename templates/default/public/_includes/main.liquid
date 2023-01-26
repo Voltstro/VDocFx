@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-bs-theme="dark">
 
   <head>
     <meta charset="utf-8" />
@@ -24,7 +24,7 @@
       {%- include header -%}
     </header>
 
-    <main class="container-xxl layout-{{layout}} page-type-{{pageType}}">
+    <main class="container layout-{{layout}} page-type-{{pageType}}">
       {%- if layout == "conceptual" -%}
         {%- unless disableBreadcrumb -%}
           <nav
@@ -62,7 +62,7 @@
       {%- endif -%}
     </main>
 
-    <footer>
+    <footer class="mt-auto py-3">
       {%- include footer -%}
     </footer>
 

@@ -1,4 +1,4 @@
 name: Volt Docfx-V3 Theme
 description: Voltstro-Studio's Docfx V3 custom theme.
 assets:
-- dist/**
+- assets/**

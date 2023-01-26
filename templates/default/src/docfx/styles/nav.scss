@@ -1,16 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-header {
-  .navbar {
-    background-color: var(--navbar-bg-color);
-  }
-
-  @media print {
-    display: none;
-  }
-}
-
 .in-this-article{
   font-size: 14px;
   padding-top: .5em;
@@ -34,27 +24,5 @@ header {
     a:hover {
       text-decoration: underline;
     }
-  }
-}
-
-.navbar-toggler, .navbar-toggler:before {
-  color: #ffffff8c !important;
-  border-color: #ffffff1a !important;
-  fill: #ffffff1a;
-}
-
-footer {
-  background-color: #f8f8f8;
-  padding: 2rem 0;
-  
-  .github-star-button {
-    display: inline-block;
-    position: relative;
-    top: 5px;
-    margin: 0 10px;
-  }
-
-  @media print {
-    display: none;
   }
 }
