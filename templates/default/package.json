@@ -3,7 +3,7 @@
   "license": "MIT",
   "version": "0.0.0",
   "scripts": {
-    "build:dev": "tsc && vite build --mode development",
+    "build:dev": "tsc -b && vite build --mode development",
     "build": "tsc -b && vite build"
   },
   "devDependencies": {

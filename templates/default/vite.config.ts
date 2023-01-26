@@ -9,7 +9,7 @@ export default defineConfig(({mode}) => {
       emptyOutDir: false,
       rollupOptions: {
         input: {
-            main: resolve(__dirname, 'src/docfx/docfx.ts')
+            docfx: resolve(__dirname, 'src/docfx/docfx.ts')
         },
         output: {
             entryFileNames: () => 'assets/[name].js',
