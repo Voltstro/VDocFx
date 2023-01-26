@@ -760,10 +760,9 @@ internal static class Errors
         /// Defined reference with by #bookmark fragment within articles, which doesn't exist.
         /// </summary>
         /// Behavior: ✔️ Message: ❌
-        public static Error BookmarkNotFound(SourceInfo? source, FilePath reference, string bookmark, IEnumerable<string> candidateBookmarks)
+        public static Error BookmarkNotFound(SourceInfo? source, FilePath reference, string bookmark)
         {
-            var tip = StringUtility.FindBestMatch(bookmark, candidateBookmarks, out var matchedBookmark) ? $", did you mean '#{matchedBookmark}'?" : ".";
-            return new(ErrorLevel.Warning, "bookmark-not-found", $"Cannot find bookmark '#{bookmark}' in '{reference}'{tip}", source);
+            return new(ErrorLevel.Warning, "bookmark-not-found", $"Cannot find bookmark '#{bookmark}' in '{reference}'", source);
         }
 
         /// <summary>

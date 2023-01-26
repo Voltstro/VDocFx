@@ -209,11 +209,7 @@ public static class DocfxTest
         var dryRun = spec.DryRunOnly || test.Matrix.Contains("DryRun") || singleFile;
         var isContinue = test.Matrix.Contains("ContinueBuild");
 
-        if (spec.LanguageServer.Count != 0)
-        {
-            RunLanguageServer(docsetPath, spec, package).GetAwaiter().GetResult();
-        }
-        else if (spec.Locale != null)
+        if (spec.Locale != null)
         {
             // always build from localization docset for localization tests
             // https://dev.azure.com/ceapex/Engineering/_build/results?buildId=97101&view=logs&j=133bd042-0fac-58b5-e6e7-01018e6dc4d4&t=b907bda6-23f1-5af4-47fe-b951a88dbb9a&l=10898
@@ -228,16 +224,6 @@ public static class DocfxTest
         else
         {
             RunBuild(docsetPath, outputPath, dryRun, singleFile, isContinue, spec, package);
-        }
-    }
-
-    private static async Task RunLanguageServer(string docsetPath, DocfxTestSpec spec, Package package)
-    {
-        await using var client = new LanguageServerTestClient(docsetPath, package, spec.NoCache);
-
-        foreach (var command in spec.LanguageServer)
-        {
-            await client.ProcessCommand(command);
         }
     }
 

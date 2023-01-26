@@ -40,7 +40,7 @@ public static class NewTest
 
         var exception = new Exception();
         Assert.Equal(exception, Assert.Throws<Exception>(() =>
-            Serve.Run(new() { Directory = Path.GetFullPath(path), Address = "127.0.0.1" }, null, OnUrl)));
+            Serve.Run(new() { Directory = Path.GetFullPath(path), Address = "127.0.0.1" }, OnUrl)));
 
         void OnUrl(string url)
         {

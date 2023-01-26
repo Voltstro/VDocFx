@@ -10,7 +10,6 @@ internal class TocBuilder
     private readonly MetadataProvider _metadataProvider;
     private readonly MetadataValidator _metadataValidator;
     private readonly DocumentProvider _documentProvider;
-    private readonly MonikerProvider _monikerProvider;
     private readonly PublishModelBuilder _publishModelBuilder;
     private readonly TemplateEngine _templateEngine;
     private readonly Output _output;
@@ -21,7 +20,6 @@ internal class TocBuilder
         MetadataProvider metadataProvider,
         MetadataValidator metadataValidator,
         DocumentProvider documentProvider,
-        MonikerProvider monikerProvider,
         PublishModelBuilder publishModelBuilder,
         TemplateEngine templateEngine,
         Output output)
@@ -31,7 +29,6 @@ internal class TocBuilder
         _metadataProvider = metadataProvider;
         _metadataValidator = metadataValidator;
         _documentProvider = documentProvider;
-        _monikerProvider = monikerProvider;
         _publishModelBuilder = publishModelBuilder;
         _templateEngine = templateEngine;
         _output = output;

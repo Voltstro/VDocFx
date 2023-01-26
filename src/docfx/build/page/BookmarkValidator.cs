@@ -55,7 +55,7 @@ internal class BookmarkValidator
                 continue;
             }
 
-            _errors.Add(Errors.Content.BookmarkNotFound(source, selfBookmark ? file : reference, bookmark, bookmarks));
+            _errors.Add(Errors.Content.BookmarkNotFound(source, selfBookmark ? file : reference, bookmark));
         }
     }
 }

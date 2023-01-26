@@ -146,7 +146,7 @@ internal class DocsetBuilder
             var publishModelBuilder = new PublishModelBuilder(_config, _errors, _monikerProvider, _buildOptions, _sourceMap, _documentProvider, _contributionProvider, _buildScope);
             var resourceBuilder = new ResourceBuilder(_input, _documentProvider, _config, output, publishModelBuilder);
             var pageBuilder = new PageBuilder(_config, _buildOptions, _input, output, _documentProvider, _metadataProvider, _monikerProvider, _publishUrlMap, _templateEngine, _tocMap, _linkResolver, _xrefResolver, _contributionProvider, _bookmarkValidator, publishModelBuilder, _metadataValidator, _markdownEngine, _redirectionProvider, _jsonSchemaTransformer);
-            var tocBuilder = new TocBuilder(_config, _tocLoader, _metadataProvider, _metadataValidator, _documentProvider, _monikerProvider, publishModelBuilder, _templateEngine, output);
+            var tocBuilder = new TocBuilder(_config, _tocLoader, _metadataProvider, _metadataValidator, _documentProvider, publishModelBuilder, _templateEngine, output);
             var redirectionBuilder = new RedirectionBuilder(publishModelBuilder, _redirectionProvider, _documentProvider);
 
             var filesToBuild = GetFilesToBuild(files);

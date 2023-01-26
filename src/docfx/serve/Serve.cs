@@ -15,7 +15,7 @@ namespace Microsoft.Docs.Build;
 
 internal static class Serve
 {
-    public static bool Run(CommandLineOptions options, Package? package = null, Action<string>? onUrl = null)
+    public static bool Run(CommandLineOptions options, Action<string>? onUrl = null)
     {
         var url = $"http://{options.Address}:{options.Port}/";
         var builder = WebApplication.CreateBuilder();
@@ -26,17 +26,9 @@ internal static class Serve
 
         using var app = builder.Build();
 
-        if (options.LanguageServer)
+        if (!ServeStaticFiles(app, options))
         {
-            PrintServeDirectory(options.WorkingDirectory);
-            app.UseWebSockets().Map("/lsp", app => app.Run(context => StartLanguageServer(context, options, package)));
-        }
-        else
-        {
-            if (!ServeStaticFiles(app, options))
-            {
-                return true;
-            }
+            return true;
         }
 
         app.Start();
@@ -58,24 +50,6 @@ internal static class Serve
                 }
             }
             Console.WriteLine("Press Ctrl+C to shut down.");
-        }
-    }
-
-    private static async Task StartLanguageServer(HttpContext context, CommandLineOptions options, Package? package)
-    {
-        // The execution context is lost here, verbose needs to be reset
-        using (Log.BeginScope(options.Verbose))
-        {
-            if (context.WebSockets.IsWebSocketRequest)
-            {
-                using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                var stream = webSocket.AsStream();
-                await LanguageServerHost.RunLanguageServer(options, PipeReader.Create(stream), PipeWriter.Create(stream), package);
-            }
-            else
-            {
-                context.Response.StatusCode = 400;
-            }
         }
     }
 

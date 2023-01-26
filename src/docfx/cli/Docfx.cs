@@ -39,7 +39,7 @@ public static class Docfx
             NewCommand(),
             RestoreCommand(),
             BuildCommand(package),
-            ServeCommand(package),
+            ServeCommand(),
         };
 
         var command = rootCommand.Parse(args);
@@ -101,9 +101,9 @@ public static class Docfx
         return command;
     }
 
-    private static Command ServeCommand(Package? package)
+    private static Command ServeCommand()
     {
-        var command = CreateCommand("serve", "Serves content in a docset.", options => Serve.Run(options, package));
+        var command = CreateCommand("serve", "Serves content in a docset.", options => Serve.Run(options));
         DefineCommonCommands(command);
         command.AddOption(new Option<string>(
             "--address", () => "127.0.0.1", "Address to use."));
@@ -111,8 +111,6 @@ public static class Docfx
             "--port", () => 8080, "Port to use. If 0, look for open port."));
         command.AddOption(new Option<bool>(
             "--no-cache", "Always fetch latest dependencies in build."));
-        command.AddOption(new Option<bool>(
-            "--language-server", "Starts a language server."));
         return command;
     }
 

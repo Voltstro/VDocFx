@@ -48,7 +48,5 @@ public class DocfxTestSpec
 
     public Dictionary<string, string> Outputs { get; set; } = new Dictionary<string, string>();
 
-    public List<LanguageServerTestCommand> LanguageServer { get; set; } = new List<LanguageServerTestCommand>();
-
     public Dictionary<string, string> Http { get; set; } = new Dictionary<string, string>();
 }
