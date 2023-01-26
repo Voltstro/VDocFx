@@ -26,19 +26,11 @@ internal class Builder
         {
             using var errors = new ErrorWriter(options.Log);
 
-            if (options.Continue)
-            {
-                // Apply templates.
-                ContinueBuild.Run(errors, options);
-            }
-            else
-            {
-                var files = options.File?.Select(Path.GetFullPath).ToArray();
+            var files = options.File?.Select(Path.GetFullPath).ToArray();
 
-                package ??= new LocalPackage(options.WorkingDirectory);
+            package ??= new LocalPackage(options.WorkingDirectory);
 
-                new Builder(options, package).Build(errors, new ConsoleProgressReporter(), files);
-            }
+            new Builder(options, package).Build(errors, new ConsoleProgressReporter(), files);
 
             errors.PrintSummary();
             return errors.HasError;
