@@ -11,7 +11,8 @@
     "sass": "^1.57.1",
     "terser": "^5.16.1",
     "typescript": "^4.9.4",
-    "vite": "^4.0.4"
+    "vite": "^4.0.4",
+    "vite-plugin-webfont-dl": "^3.4.3"
   },
   "dependencies": {
     "anchor-js": "^5.0.0",

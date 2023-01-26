@@ -1,8 +1,10 @@
 import { defineConfig, UserConfig } from 'vite'
+import { webfontDownload } from 'vite-plugin-webfont-dl';
 import { resolve } from 'path'
 
 export default defineConfig(({mode}) => {
   let config: UserConfig = {
+    plugins: [webfontDownload(["https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap"])],
     build: {
       //No minify in dev builds, speeds shit up
       minify: false,
