@@ -96,7 +96,7 @@ internal class XrefInlineShortParser : InlineParser
 
         var c = slice.NextChar();
 
-        while (c != startChar && !c.IsNewLine() && !c.IsZero())
+        while (c != startChar && !c.IsNewLineOrLineFeed() && !c.IsZero())
         {
             href.Append(c);
             c = slice.NextChar();

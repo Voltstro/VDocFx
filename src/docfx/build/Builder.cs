@@ -68,7 +68,7 @@ internal class Builder
         // load and trace entry repository
         var repository = Repository.Create(_package.BasePath);
 
-        var docsets = ConfigLoader.FindDocsets(_errors, _package, _options, repository);
+        var docsets = ConfigLoader.FindDocsets(_errors, _package, _options.Output, repository);
         if (docsets.Length == 0)
         {
             _errors.Add(Errors.Config.ConfigNotFound(_options.WorkingDirectory));

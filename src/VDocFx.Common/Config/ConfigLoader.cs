@@ -10,12 +10,12 @@ namespace Microsoft.Docs.Build;
 internal static class ConfigLoader
 {
     public static (string docsetPath, string? outputPath)[] FindDocsets(
-        ErrorBuilder errors, Package package, CommandLineOptions options, Repository? repository)
+        ErrorBuilder errors, Package package, string? output, Repository? repository)
     {
         var glob = FindDocsetsGlob(errors, package, repository);
         if (glob is null)
         {
-            return new[] { (package.BasePath.Value, options.Output) };
+            return new[] { (package.BasePath.Value, output) };
         }
 
         var files = package.GetFiles(allowedFileNames: new string[] { "docfx.json", "docfx.yml" });
@@ -26,7 +26,7 @@ internal static class ConfigLoader
             let fullPath = package.GetFullFilePath(file)
             let docsetPath = Path.GetDirectoryName(fullPath)
             let docsetFolder = Path.GetDirectoryName(file)
-            let outputPath = string.IsNullOrEmpty(options.Output) ? null : Path.Combine(options.Output, docsetFolder)
+            let outputPath = string.IsNullOrEmpty(output) ? null : Path.Combine(output, docsetFolder)
             select (docsetPath, outputPath)).Distinct().ToArray();
     }
 
@@ -38,7 +38,6 @@ internal static class ConfigLoader
         Repository? repository,
         string docsetPath,
         string? outputPath,
-        CommandLineOptions options,
         FetchOptions fetchOptions,
         Package package,
         CredentialProvider? getCredential = null)
@@ -54,17 +53,6 @@ internal static class ConfigLoader
         // Load configs available locally
         var envConfig = LoadEnvironmentVariables(Environment.GetEnvironmentVariables().Cast<DictionaryEntry>());
         var cliConfig = new JObject();
-        JsonUtility.Merge(unionProperties, cliConfig, options.StdinConfig, options.ToJObject());
-
-        if (options.StdinConfig != null)
-        {
-            var stdinObj = new JObject();
-            JsonUtility.Merge(
-                stdinObj,
-                options.StdinConfig,
-                new JObject { ["secrets"] = MaskUtility.HideSecret(options.StdinConfig["secrets"] ?? new JObject()) });
-            Log.Write($"stdin config: {stdinObj}");
-        }
 
         var globalConfig = LoadConfig(errors, package, new PathString(AppData.Root));
 

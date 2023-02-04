@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Microsoft.Docs.Build;
 
 [SuppressMessage("Reliability", "CA2002", Justification = "Lock Console.Out")]
-internal static class Log
+public static class Log
 {
     private static readonly AsyncLocal<bool> s_verbose = new();
 

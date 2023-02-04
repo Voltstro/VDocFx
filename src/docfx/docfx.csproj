@@ -36,6 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="../docfx-api-dotnet/docfx-api-dotnet.csproj" />
     <ProjectReference Include="../Microsoft.Docs.MarkdigExtensions/Microsoft.Docs.MarkdigExtensions.csproj" />
+    <ProjectReference Include="..\VDocFx.Common\VDocFx.Common.csproj" />
   </ItemGroup>
 
 </Project>

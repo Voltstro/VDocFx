@@ -15,12 +15,12 @@ internal class RepositoryProvider
 
     public Repository? Repository { get; }
 
-    public RepositoryProvider(ErrorBuilder errors, BuildOptions buildOptions, Config config)
+    public RepositoryProvider(ErrorBuilder errors, Repository? repository, bool dryRun, bool isLocalizedBuild)
     {
         _errors = errors;
-        Repository = buildOptions.Repository;
+        Repository = repository;
 
-        if (Repository != null && !config.DryRun && !buildOptions.IsLocalizedBuild)
+        if (Repository != null && !dryRun && !isLocalizedBuild)
         {
             GetCommitLoader(Repository).WarmUp();
         }

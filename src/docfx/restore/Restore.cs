@@ -12,7 +12,7 @@ internal static class Restore
         var package = new LocalPackage(options.WorkingDirectory);
         var repository = Repository.Create(package.BasePath);
 
-        var docsets = ConfigLoader.FindDocsets(errors, package, options, repository);
+        var docsets = ConfigLoader.FindDocsets(errors, package, options.Output, repository);
         if (docsets.Length == 0)
         {
             errors.Add(Errors.Config.ConfigNotFound(options.WorkingDirectory));
@@ -42,7 +42,7 @@ internal static class Restore
         {
             // load configuration from current entry or fallback repository
             var localPackage = new LocalPackage(Path.Combine(options.WorkingDirectory, docsetPath));
-            var (config, buildOptions, packageResolver, fileResolver) = ConfigLoader.Load(errorLog, repository, docsetPath, outputPath, options, fetchOptions, localPackage);
+            var (config, buildOptions, packageResolver, fileResolver) = ConfigLoader.Load(errorLog, repository, docsetPath, outputPath, fetchOptions, localPackage);
 
             if (errorLog.HasError)
             {

@@ -106,7 +106,7 @@ internal class DocsetBuilder
             progressReporter.Report("Loading config...");
             var fetchOptions = options.NoRestore ? FetchOptions.NoFetch : (options.NoCache ? FetchOptions.Latest : FetchOptions.UseCache);
             var (config, buildOptions, packageResolver, fileResolver) = ConfigLoader.Load(
-               errorLog, repository, docsetPath, outputPath, options, fetchOptions, package, getCredential);
+               errorLog, repository, docsetPath, outputPath, fetchOptions, package, getCredential);
 
             if (errorLog.HasError)
             {
@@ -125,7 +125,7 @@ internal class DocsetBuilder
                 }
             }
 
-            var repositoryProvider = new RepositoryProvider(errorLog, buildOptions, config);
+            var repositoryProvider = new RepositoryProvider(errorLog, repository, config.DryRun, false);
 
             return new DocsetBuilder(errorLog, config, buildOptions, packageResolver, fileResolver, repositoryProvider, package, progressReporter);
         }

@@ -17,8 +17,7 @@ internal static class HtmlExtension
         Func<ErrorBuilder> getErrors,
         Func<LinkInfo, string> getLink,
         Func<SourceInfo<string>?, SourceInfo<string>?, bool, XrefLink> resolveXref,
-        HtmlSanitizer htmlSanitizer,
-        DocumentProvider documentProvider)
+        HtmlSanitizer htmlSanitizer)
     {
         return builder.Use(document =>
         {

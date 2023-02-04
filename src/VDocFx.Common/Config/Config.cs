@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Runtime.Serialization;
-using ECMA2Yaml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -277,12 +276,6 @@ internal class Config : PreloadConfig
     /// Determines if disable dry sync
     /// </summary>
     public bool NoDrySync { get; init; }
-
-    /// <summary>
-    /// Determines and configures build to consume XML files produced from monodoc
-    /// </summary>
-    [JsonConverter(typeof(OneOrManyConverter))]
-    public ECMA2YamlRepoConfig[]? Monodoc { get; init; }
 
     /// <summary>
     /// Determines and configures build to convert MAML markdown files to SDP yaml files as input
