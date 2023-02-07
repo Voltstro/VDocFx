@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="vdocfx" />
+    <InternalsVisibleTo Include="VDocFx.Api.Dotnet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VDocFx.Common\VDocFx.Common.csproj" />
+  </ItemGroup>
+</Project>

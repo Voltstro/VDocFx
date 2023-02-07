@@ -95,9 +95,7 @@ public static class Docfx
         command.AddOption(new Option<string>(
             "--template-base-path", "The base path used for referencing the template resource file when applying liquid."));
         command.AddOption(new Option<bool>(
-            "--continue", "Continue build based on intermediate json output."));
-        command.AddOption(new Option<string>(
-            "--locale", "Locale info for continue build."));
+            "--metadata", "Build metadata"));
         return command;
     }
 

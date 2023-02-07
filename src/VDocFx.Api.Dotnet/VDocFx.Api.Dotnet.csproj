@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <DefineConstants>NEW_CECIL</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <InternalsVisibleTo Include="vdocfx" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\VDocFx.Api\VDocFx.Api.csproj" />
+    <ProjectReference Include="..\VDocFx.Common\VDocFx.Common.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
+  </ItemGroup>
+</Project>

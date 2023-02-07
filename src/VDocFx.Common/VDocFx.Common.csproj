@@ -8,6 +8,8 @@
     <InternalsVisibleTo Include="vdocfx" />
     <InternalsVisibleTo Include="VDocFx.Test" />
     <InternalsVisibleTo Include="VDocFx.SpecTest" />
+    <InternalsVisibleTo Include="VDocFx.Api" />
+    <InternalsVisibleTo Include="VDocFx.Api.Dotnet" />
   </ItemGroup>
 
     <ItemGroup>

@@ -30,8 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../docfx-api-dotnet/docfx-api-dotnet.csproj" />
     <ProjectReference Include="../Microsoft.Docs.MarkdigExtensions/Microsoft.Docs.MarkdigExtensions.csproj" />
+    <ProjectReference Include="..\VDocFx.Api.Dotnet\VDocFx.Api.Dotnet.csproj" />
+    <ProjectReference Include="..\VDocFx.Api\VDocFx.Api.csproj" />
     <ProjectReference Include="..\VDocFx.Common\VDocFx.Common.csproj" />
   </ItemGroup>
 

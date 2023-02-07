@@ -7,13 +7,11 @@ namespace Microsoft.Docs.Build;
 
 internal class CommandLineOptions
 {
-    public string? Locale { get; init; }
-
-    public bool Continue { get; init; }
-
     public string? Output { get; init; }
 
     public string? Log { get; init; }
+
+    public bool Metadata { get; init; }
 
     public bool Verbose { get; init; }
 
@@ -32,8 +30,6 @@ internal class CommandLineOptions
     public bool NoCache { get; init; }
 
     public bool NoRestore { get; init; }
-
-    public bool LanguageServer { get; init; }
 
     public int Port { get; init; }
 
