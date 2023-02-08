@@ -7,30 +7,35 @@ internal class Builder
 {
     private readonly ScopedErrorBuilder _errors = new();
     private readonly ScopedProgressReporter _progressReporter = new();
-    private readonly CommandLineOptions _options;
     private readonly Watch<DocsetBuilder[]> _docsets;
     private readonly Package _package;
     private readonly CredentialProvider? _getCredential;
 
-    public Builder(CommandLineOptions options, Package package, CredentialProvider? getCredential = null)
+    private readonly string _output;
+    private readonly bool _dryRun;
+    private readonly bool _noRestore;
+    private readonly bool _noCache;
+
+    public Builder(Package package, string output, bool dryRun, bool noRestore, bool noCache, CredentialProvider? getCredential = null)
     {
-        _options = options;
         _package = package;
+        _output = output;
+        _dryRun = dryRun;
+        _noRestore = noRestore;
+        _noCache = noCache;
         _getCredential = getCredential;
         _docsets = new(LoadDocsets);
     }
 
-    public static bool Run(CommandLineOptions options, Package? package = null)
+    public static bool Run(string output, bool dryRun, bool noRestore, bool noCache, Package? package = null)
     {
         using (Watcher.Disable())
         {
-            using var errors = new ErrorWriter(options.Log);
+            using var errors = new ErrorWriter();
 
-            var files = options.File?.Select(Path.GetFullPath).ToArray();
+            package ??= new LocalPackage();
 
-            package ??= new LocalPackage(options.WorkingDirectory);
-
-            new Builder(options, package).Build(errors, new ConsoleProgressReporter(), files);
+            new Builder(package, output, dryRun, noRestore, noCache).Build(errors, new ConsoleProgressReporter());
 
             errors.PrintSummary();
             return errors.HasError;
@@ -68,10 +73,10 @@ internal class Builder
         // load and trace entry repository
         var repository = Repository.Create(_package.BasePath);
 
-        var docsets = ConfigLoader.FindDocsets(_errors, _package, _options.Output, repository);
+        var docsets = ConfigLoader.FindDocsets(_errors, _package, _output, repository);
         if (docsets.Length == 0)
         {
-            _errors.Add(Errors.Config.ConfigNotFound(_options.WorkingDirectory));
+            _errors.Add(Errors.Config.ConfigNotFound(Directory.GetCurrentDirectory()));
         }
 
         return (from docset in docsets
@@ -79,9 +84,10 @@ internal class Builder
                     _errors,
                     repository,
                     docset.docsetPath,
+                    _noRestore,
+                    _noCache,
                     docset.outputPath,
                     _package.CreateSubPackage(docset.docsetPath),
-                    _options,
                     _progressReporter,
                     _getCredential)
                 where item != null
@@ -90,6 +96,6 @@ internal class Builder
 
     private string GetPathToDocset(DocsetBuilder docset, string file)
     {
-        return Path.GetRelativePath(docset.BuildOptions.DocsetPath, Path.Combine(_options.WorkingDirectory, file));
+        return Path.GetRelativePath(docset.BuildOptions.DocsetPath, Path.Combine(".", file));
     }
 }

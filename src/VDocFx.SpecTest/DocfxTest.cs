@@ -346,19 +346,8 @@ public static class DocfxTest
 
     private static void RunSingleFileBuild(string docsetPath, string outputPath, DocfxTestSpec spec, Package package)
     {
-        // Single file build builds each content file and verifies the union of
-        // each file build result is the same as expected output. Implies dryRun.
-        var commandLine = new CommandLineOptions
-        {
-            Directory = docsetPath,
-            Output = outputPath,
-            DryRun = true,
-            NoRestore = spec.NoRestore,
-            NoDrySync = spec.NoDrySync,
-        };
-
         var errors = new ErrorList();
-        var builder = new Builder(commandLine, package);
+        var builder = new Builder(package, outputPath, true, spec.NoRestore, true);
 
         foreach (var (file, _) in spec.Inputs)
         {

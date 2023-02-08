@@ -15,9 +15,9 @@ namespace Microsoft.Docs.Build;
 
 internal static class Serve
 {
-    public static bool Run(CommandLineOptions options, Action<string>? onUrl = null)
+    public static bool Run(string address, int port)
     {
-        var url = $"http://{options.Address}:{options.Port}/";
+        var url = $"http://{address}:{port}/";
         var builder = WebApplication.CreateBuilder();
 
         builder.WebHost
@@ -26,7 +26,7 @@ internal static class Serve
 
         using var app = builder.Build();
 
-        if (!ServeStaticFiles(app, options))
+        if (!ServeStaticFiles(app))
         {
             return true;
         }
@@ -46,16 +46,15 @@ internal static class Serve
                 foreach (var url in urls)
                 {
                     Console.WriteLine($"  {url}");
-                    onUrl?.Invoke(url);
                 }
             }
             Console.WriteLine("Press Ctrl+C to shut down.");
         }
     }
 
-    private static bool ServeStaticFiles(IApplicationBuilder app, CommandLineOptions options)
+    private static bool ServeStaticFiles(IApplicationBuilder app)
     {
-        var publishFiles = Directory.GetFiles(options.WorkingDirectory, ".publish.json", SearchOption.AllDirectories);
+        var publishFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), ".publish.json", SearchOption.AllDirectories);
         if (!publishFiles.Any())
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;

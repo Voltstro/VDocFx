@@ -7,29 +7,27 @@ internal static class New
 {
     private static readonly string s_templatePath = Path.Combine(AppContext.BaseDirectory, "data", "new");
 
-    public static bool Run(CommandLineOptions options)
+    public static bool Run(string? outPut, bool force, bool gitInit, string? template)
     {
-        var templateName = options.TemplateName;
-
-        if (string.IsNullOrEmpty(templateName) ||
-            !templateName.All(ch => char.IsLetterOrDigit(ch) || ch == '-') ||
-            !Directory.Exists(Path.Combine(s_templatePath, templateName)))
+        if (string.IsNullOrEmpty(template) ||
+            !template.All(ch => char.IsLetterOrDigit(ch) || ch == '-') ||
+            !Directory.Exists(Path.Combine(s_templatePath, template)))
         {
             ShowTemplates();
             return true;
         }
 
-        if (options.Force)
+        if (force)
         {
-            return CreateFromTemplate(templateName, options, dryRun: false);
+            return CreateFromTemplate(template, outPut, gitInit, force, dryRun: false);
         }
 
-        if (CreateFromTemplate(templateName, options, dryRun: true))
+        if (CreateFromTemplate(template, outPut, gitInit, force, dryRun: true))
         {
             return true;
         }
 
-        return CreateFromTemplate(templateName, options, dryRun: false);
+        return CreateFromTemplate(template, outPut, gitInit, force, dryRun: false);
     }
 
     private static void ShowTemplates()
@@ -59,9 +57,9 @@ internal static class New
         }
     }
 
-    private static bool CreateFromTemplate(string templateName, CommandLineOptions options, bool dryRun)
+    private static bool CreateFromTemplate(string templateName, string? output, bool gitInit, bool force, bool dryRun)
     {
-        var output = options.Output ?? ".";
+        output ??= ".";
         var overwriteFiles = new List<string>();
 
         foreach (var file in Directory.GetFiles(Path.Combine(s_templatePath, templateName)))
@@ -85,11 +83,11 @@ internal static class New
             {
                 var directory = Path.GetDirectoryName(targetFullPath) ?? ".";
                 Directory.CreateDirectory(directory);
-                if (options.GitInit)
+                if (gitInit)
                 {
                     GitUtility.Init(directory);
                 }
-                File.Copy(file, targetFullPath, overwrite: options.Force);
+                File.Copy(file, targetFullPath, overwrite: force);
             }
         }
 
@@ -115,11 +113,7 @@ internal static class New
         }
 
         Console.WriteLine($"The template \"{templateName}\" was created successfully.");
-        Console.WriteLine();
 
-        Console.WriteLine($"Restoring dependencies in \"{output}\"");
-
-        options.Directory = output;
-        return Restore.Run(options);
+        return true;
     }
 }

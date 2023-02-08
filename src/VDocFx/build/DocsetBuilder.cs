@@ -94,18 +94,19 @@ internal class DocsetBuilder
         ErrorBuilder errors,
         Repository? repository,
         string docsetPath,
+        bool noRestore,
+        bool noCache,
         string? outputPath,
         Package package,
-        CommandLineOptions options,
         IProgress<string> progressReporter,
         CredentialProvider? getCredential = null)
     {
-        var errorLog = new ErrorLog(errors, options.WorkingDirectory, docsetPath);
+        var errorLog = new ErrorLog(errors, Directory.GetCurrentDirectory(), docsetPath);
 
         try
         {
             progressReporter.Report("Loading config...");
-            var fetchOptions = options.NoRestore ? FetchOptions.NoFetch : (options.NoCache ? FetchOptions.Latest : FetchOptions.UseCache);
+            var fetchOptions = noRestore ? FetchOptions.NoFetch : (noCache ? FetchOptions.Latest : FetchOptions.UseCache);
             var (config, buildOptions, packageResolver, fileResolver) = ConfigLoader.Load(
                errorLog, repository, docsetPath, outputPath, fetchOptions, package, getCredential);
 
@@ -116,7 +117,7 @@ internal class DocsetBuilder
 
             errorLog.Config = config;
 
-            if (!options.NoRestore)
+            if (!noRestore)
             {
                 progressReporter.Report("Restoring dependencies...");
                 Restore.RestoreDocset(errorLog, config, packageResolver, fileResolver);

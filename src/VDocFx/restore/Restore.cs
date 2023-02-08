@@ -5,59 +5,6 @@ namespace Microsoft.Docs.Build;
 
 internal static class Restore
 {
-    public static bool Run(CommandLineOptions options)
-    {
-        using var errors = new ErrorWriter(options.Log);
-
-        var package = new LocalPackage(options.WorkingDirectory);
-        var repository = Repository.Create(package.BasePath);
-
-        var docsets = ConfigLoader.FindDocsets(errors, package, options.Output, repository);
-        if (docsets.Length == 0)
-        {
-            errors.Add(Errors.Config.ConfigNotFound(options.WorkingDirectory));
-            return errors.HasError;
-        }
-
-        Parallel.ForEach(
-            docsets,
-            docset => RestoreDocset(
-                errors, repository, docset.docsetPath, docset.outputPath, options, FetchOptions.Latest));
-
-        errors.PrintSummary();
-        return errors.HasError;
-    }
-
-    public static void RestoreDocset(
-        ErrorBuilder errors,
-        Repository? repository,
-        string docsetPath,
-        string? outputPath,
-        CommandLineOptions options,
-        FetchOptions fetchOptions)
-    {
-        var errorLog = new ErrorLog(errors, options.WorkingDirectory, docsetPath);
-
-        try
-        {
-            // load configuration from current entry or fallback repository
-            var localPackage = new LocalPackage(Path.Combine(options.WorkingDirectory, docsetPath));
-            var (config, buildOptions, packageResolver, fileResolver) = ConfigLoader.Load(errorLog, repository, docsetPath, outputPath, fetchOptions, localPackage);
-
-            if (errorLog.HasError)
-            {
-                return;
-            }
-
-            errorLog.Config = config;
-            RestoreDocset(errorLog, config, packageResolver, fileResolver);
-        }
-        catch (Exception ex) when (DocfxException.IsDocfxException(ex, out var dex))
-        {
-            errorLog.AddRange(dex);
-        }
-    }
-
     public static void RestoreDocset(
         ErrorBuilder errors, Config config, PackageResolver packageResolver, FileResolver fileResolver)
     {
