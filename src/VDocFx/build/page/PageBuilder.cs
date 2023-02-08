@@ -120,7 +120,7 @@ internal class PageBuilder
 
         // Mandatory metadata are metadata that are required by template to successfully ran to completion.
         // The bookmark validation for SDP can be skipped when the public template is used since the mustache is not accessable for public template
-        if (_config.DryRun && (JsonSchemaProvider.IsConceptual(mime) || _config.Template.Type == PackageType.PublicTemplate))
+        if (_config.DryRun && (JsonSchemaProvider.IsConceptual(mime)))
         {
             return (new JObject(), new JObject());
         }

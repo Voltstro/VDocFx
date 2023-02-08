@@ -52,7 +52,7 @@ internal class PackageResolver
     {
         return package.Type switch
         {
-            PackageType.PublicTemplate => new PublicTemplatePackage(package.Url, _fileResolver),
+            PackageType.Builtin => new InBuiltPackage(package.Path),
             _ => new LocalPackage(ResolvePackage(package, options)),
         };
     }

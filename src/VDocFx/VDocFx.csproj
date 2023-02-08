@@ -12,6 +12,10 @@
   <ItemGroup>
     <None Include="../../docs/**/*" LinkBase="docs" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="../../templates/default/dist/**/*" LinkBase="data/templates/default" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="VDocFx.Test" />

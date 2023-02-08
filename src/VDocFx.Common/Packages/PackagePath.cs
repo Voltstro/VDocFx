@@ -30,6 +30,8 @@ internal record PackagePath
 
     public bool IsMainOrMasterOrDefault => Branch == "main" || Branch == "master" || string.IsNullOrEmpty(Branch);
 
+    public bool Builtin { get; init; }
+
     public PackagePath()
     {
     }
@@ -38,19 +40,18 @@ internal record PackagePath
     {
         if (UrlUtility.IsHttp(value))
         {
-            if (value.StartsWith("https://static.docs.com/ui/"))
-            {
-                Type = PackageType.PublicTemplate;
-                Url = value;
-            }
-            else
-            {
-                Type = PackageType.Git;
-                (Url, Branch) = SplitGitUrl(value);
-            }
+            Type = PackageType.Git;
+            (Url, Branch) = SplitGitUrl(value);
         }
         else
         {
+            if (!System.IO.Path.Exists(value))
+            {
+                Type = PackageType.Builtin;
+                Path = value;
+                return;
+            }
+
             Type = PackageType.Folder;
             Path = value;
         }

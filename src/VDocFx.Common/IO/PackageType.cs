@@ -8,5 +8,5 @@ public enum PackageType
     None,
     Folder,
     Git,
-    PublicTemplate,
+    Builtin,
 }
