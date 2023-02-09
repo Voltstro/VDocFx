@@ -85,17 +85,19 @@ public static class Docfx
             "--no-restore", "Do not restore dependencies before build.");
         var noCacheOption = new Option<bool>(
             "--no-cache", "Always fetch latest dependencies in build.");
+        var outputTypeOption = new Option<OutputType?>("--output-type", getDefaultValue: () => null, "The mode for outputting files");
 
         var command = new Command("build", "Builds a docset.");
         command.AddOption(outputOption);
         command.AddOption(dryRunOption);
         command.AddOption(noRestoreOption);
         command.AddOption(noCacheOption);
+        command.AddOption(outputTypeOption);
 
-        command.SetHandler((output, dryRun, noRestore, noCache) =>
+        command.SetHandler((output, dryRun, noRestore, noCache, outputType) =>
         {
-            Builder.Run(output, dryRun, noRestore, noCache, package);
-        }, outputOption, dryRunOption, noRestoreOption, noCacheOption);
+            Builder.Run(output, dryRun, noRestore, noCache, outputType, package);
+        }, outputOption, dryRunOption, noRestoreOption, noCacheOption, outputTypeOption);
 
         return command;
     }

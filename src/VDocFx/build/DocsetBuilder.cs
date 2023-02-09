@@ -97,6 +97,7 @@ internal class DocsetBuilder
         bool noRestore,
         bool noCache,
         string? outputPath,
+        OutputType? outputType,
         Package package,
         IProgress<string> progressReporter,
         CredentialProvider? getCredential = null)
@@ -116,6 +117,9 @@ internal class DocsetBuilder
             }
 
             errorLog.Config = config;
+
+            if (outputType.HasValue)
+                config.OutputType = outputType.Value;
 
             if (!noRestore)
             {

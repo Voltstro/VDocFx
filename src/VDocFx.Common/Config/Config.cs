@@ -44,7 +44,7 @@ internal class Config : PreloadConfig
     /// <summary>
     /// Gets output file type
     /// </summary>
-    public OutputType OutputType { get; init; } = OutputType.Html;
+    public OutputType OutputType { get; internal set; } = OutputType.Html;
 
     /// <summary>
     /// Gets whether the repository a reference repository.

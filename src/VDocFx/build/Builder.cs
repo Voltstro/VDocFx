@@ -15,19 +15,22 @@ internal class Builder
     private readonly bool _dryRun;
     private readonly bool _noRestore;
     private readonly bool _noCache;
+    private readonly OutputType? _outputType;
 
-    public Builder(Package package, string output, bool dryRun, bool noRestore, bool noCache, CredentialProvider? getCredential = null)
+    public Builder(Package package, string output, bool dryRun, bool noRestore, bool noCache, OutputType? outputType,
+        CredentialProvider? getCredential = null)
     {
         _package = package;
         _output = output;
         _dryRun = dryRun;
         _noRestore = noRestore;
         _noCache = noCache;
+        _outputType = outputType;
         _getCredential = getCredential;
         _docsets = new(LoadDocsets);
     }
 
-    public static bool Run(string output, bool dryRun, bool noRestore, bool noCache, Package? package = null)
+    public static bool Run(string output, bool dryRun, bool noRestore, bool noCache, OutputType? outputType, Package? package = null)
     {
         using (Watcher.Disable())
         {
@@ -35,7 +38,7 @@ internal class Builder
 
             package ??= new LocalPackage();
 
-            new Builder(package, output, dryRun, noRestore, noCache).Build(errors, new ConsoleProgressReporter());
+            new Builder(package, output, dryRun, noRestore, noCache, outputType).Build(errors, new ConsoleProgressReporter());
 
             errors.PrintSummary();
             return errors.HasError;
@@ -87,6 +90,7 @@ internal class Builder
                     _noRestore,
                     _noCache,
                     docset.outputPath,
+                    _outputType,
                     _package.CreateSubPackage(docset.docsetPath),
                     _progressReporter,
                     _getCredential)
