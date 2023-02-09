@@ -1,0 +1,20 @@
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: ubuntu-22.04
+    steps:
+    - task: UseDotNet@2
+      displayName: Install .NET 7
+      inputs:
+        version: 7.x
+
+    - script: 'dotnet restore src/VDocFx.sln'
+      displayName: Restore Packages
+
+    - script: 'dotnet publish src/VDocFx.sln --no-restore -c $(buildConfiguration)'
+      displayName: Build Project
