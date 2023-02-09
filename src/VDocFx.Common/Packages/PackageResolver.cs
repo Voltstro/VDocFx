@@ -48,6 +48,17 @@ internal class PackageResolver
         }
     }
 
+    /// <summary>
+    ///     Resolves an array of <see cref="Package"/>s as a <see cref="PackagesMerger"/>
+    /// </summary>
+    /// <param name="packagePaths"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public PackagesMerger ResolvedAsMergedPackages(PackagePath[] packagePaths, PackageFetchOptions options)
+    {
+        return new PackagesMerger(packagePaths.Select(packagePath => ResolveAsPackage(packagePath, options)).ToArray());
+    }
+
     public Package ResolveAsPackage(PackagePath package, PackageFetchOptions options)
     {
         return package.Type switch

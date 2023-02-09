@@ -221,7 +221,7 @@ internal class Config : PreloadConfig
     /// <summary>
     /// Get the template folder or git repository url (like https://github.com/docs/theme#master)
     /// </summary>
-    public PackagePath Template { get; init; } = new PackagePath("https://github.com/docascode/template");
+    public PackagePath[] Templates { get; init; } = new [] {new PackagePath("default")};
 
     /// <summary>
     /// Get the template base path used for referencing the template resource file when apply liquid.

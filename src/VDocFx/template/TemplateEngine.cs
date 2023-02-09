@@ -30,14 +30,22 @@ internal class TemplateEngine
         string locale,
         BookmarkValidator? bookmarkValidator = null)
     {
-        var template = config.Template;
+        var templates = config.Templates;
         var templateFetchOptions = PackageFetchOptions.DepthOne;
-        if (template.Type == PackageType.None)
+        for (var i = 0; i < templates.Length; i++)
         {
+            var template = templates[i];
+            if (template.Type != PackageType.None)
+            {
+                continue;
+            }
+
             template = new("_themes");
             templateFetchOptions |= PackageFetchOptions.IgnoreDirectoryNonExistedError;
+            templates[i] = template;
         }
-        var package = packageResolver.ResolveAsPackage(template, templateFetchOptions);
+
+        var package = packageResolver.ResolvedAsMergedPackages(templates, templateFetchOptions);
 
         return new TemplateEngine(errors, config, package, locale, bookmarkValidator);
     }

@@ -84,10 +84,6 @@ internal static class ConfigLoader
         var configObject = new JObject();
         JsonUtility.Merge(unionProperties, configObject, envConfig, globalConfig, extendConfig, docfxConfig, cliConfig);
         var config = JsonUtility.ToObject<Config>(errors, configObject);
-        if (config.ValidateTemplateBranch)
-        {
-            ValidateTemplateBranch(config.Template);
-        }
         return (config, buildOptions, packageResolver, fileResolver);
     }
 
@@ -230,13 +226,5 @@ internal static class ConfigLoader
         }
 
         return null;
-    }
-
-    private static void ValidateTemplateBranch(PackagePath template)
-    {
-        if (!template.IsMainOrMasterOrDefault)
-        {
-            throw Errors.Config.TemplateBranchInvalid(template.Branch).ToException();
-        }
     }
 }

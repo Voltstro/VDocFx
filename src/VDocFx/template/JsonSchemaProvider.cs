@@ -7,7 +7,6 @@ namespace Microsoft.Docs.Build;
 
 internal class JsonSchemaProvider
 {
-    private readonly PackagePath _template;
     private readonly Package _package;
     private readonly JsonSchemaLoader _jsonSchemaLoader;
 
@@ -22,23 +21,22 @@ internal class JsonSchemaProvider
 
     public JsonSchemaProvider(Config config, PackageResolver packageResolver, JsonSchemaLoader jsonSchemaLoader)
     {
-        var template = config.Template;
+        var templates = config.Templates;
         var templateFetchOptions = PackageFetchOptions.DepthOne;
-        if (template.Type == PackageType.None)
+        for (var i = 0; i < templates.Length; i++)
         {
+            var template = templates[i];
+            if (template.Type != PackageType.None)
+            {
+                continue;
+            }
+
             template = new("_themes");
             templateFetchOptions |= PackageFetchOptions.IgnoreDirectoryNonExistedError;
+            templates[i] = template;
         }
 
-        _package = packageResolver.ResolveAsPackage(template, templateFetchOptions);
-        _template = template;
-        _jsonSchemaLoader = jsonSchemaLoader;
-    }
-
-    public JsonSchemaProvider(Config config, Package package, JsonSchemaLoader jsonSchemaLoader)
-    {
-        _template = config.Template;
-        _package = package;
+        _package = packageResolver.ResolvedAsMergedPackages(templates, templateFetchOptions);
         _jsonSchemaLoader = jsonSchemaLoader;
     }
 
@@ -108,17 +106,6 @@ internal class JsonSchemaProvider
 
     private RenderType GetTocRenderType()
     {
-        // Refer to https://ceapex.visualstudio.com/Engineering/_workitems/edit/537091
-        // There is a toc.schema.json file existing in templates.docs.msft repo whose 'renderType' is set to 'component'
-        // (https://github.com/microsoft/templates.docs.msft/blob/master/ContentTemplate/schemas/Toc.schema.json#L7)
-        // This will break the PDF process because PDF asks it to be 'content' (so that docfx can generate 'toc.html' which is necessary for building PDF)
-        // To avoid unexpected breaking PDF process through sync templates, special logic dealing with PDF cases goes first.
-        if (_template.Url.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) ||
-            _template.Path.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-        {
-            return RenderType.Content;
-        }
-
         try
         {
             return GetSchema(new SourceInfo<string?>("toc")).RenderType;

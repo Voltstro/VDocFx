@@ -37,9 +37,12 @@ internal static class Restore
             yield return (package, package.PackageFetchOptions);
         }
 
-        if (config.Template.Type == PackageType.Git)
+        foreach (var template in config.Templates)
         {
-            yield return (config.Template, PackageFetchOptions.DepthOne | PackageFetchOptions.IgnoreBranchFallbackError);
+            if (template.Type == PackageType.Git)
+            {
+                yield return (template, PackageFetchOptions.DepthOne | PackageFetchOptions.IgnoreBranchFallbackError);
+            }
         }
     }
 }
