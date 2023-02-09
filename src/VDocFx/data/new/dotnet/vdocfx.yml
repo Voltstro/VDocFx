@@ -1,0 +1,11 @@
+templates:
+  - default
+globalMetadata:
+  _appTitle: My Awesome Website
+  _appFooter: Copyright (c) 2023 Me
+  menu_path: menu.yml
+dotnet:
+  assemblies:
+    - CatLibrary.dll
+xref:
+  - https://docs.microsoft.com/en-us/dotnet/.xrefmap.json

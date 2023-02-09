@@ -1,8 +1,0 @@
-{
-  "template": "https://github.com/docascode/template",
-  "globalMetadata": {
-    "_appTitle": "My Awesome Website",
-    "_appFooter": "© Microsoft",
-    "menu_path": "menu.yml"
-  }
-}

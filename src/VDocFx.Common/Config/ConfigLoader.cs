@@ -18,7 +18,7 @@ internal static class ConfigLoader
             return new[] { (package.BasePath.Value, output) };
         }
 
-        var files = package.GetFiles(allowedFileNames: new string[] { "docfx.json", "docfx.yml" });
+        var files = package.GetFiles(allowedFileNames: new string[] { "vdocfx.json", "vdocfx.yml" });
 
         return (
             from file in files
@@ -161,7 +161,7 @@ internal static class ConfigLoader
 
     private static JObject? LoadConfig(ErrorBuilder errors, Package package, PathString directory = default)
     {
-        var config = package.TryLoadYamlOrJson<JObject>(errors, "docfx", directory);
+        var config = package.TryLoadYamlOrJson<JObject>(errors, "vdocfx", directory);
         if (config is null)
         {
             return null;

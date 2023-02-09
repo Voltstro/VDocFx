@@ -188,7 +188,7 @@ internal static class Errors
         /// </summary>
         /// Behavior: ✔️ Message: ✔️
         public static Error ConfigNotFound(string docsetPath)
-            => new(ErrorLevel.Error, "config-not-found", $"Can't find docfx config file in '{docsetPath}'.");
+            => new(ErrorLevel.Error, "config-not-found", $"Can't find vdocfx config file in '{docsetPath}'.");
 
         /// <summary>
         /// Build an OPS repo with a docset name that isn't provisioned.
