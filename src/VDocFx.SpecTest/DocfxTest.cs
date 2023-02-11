@@ -347,7 +347,7 @@ public static class DocfxTest
     private static void RunSingleFileBuild(string docsetPath, string outputPath, DocfxTestSpec spec, Package package)
     {
         var errors = new ErrorList();
-        var builder = new Builder(package, outputPath, true, spec.NoRestore, true);
+        var builder = new Builder(package, outputPath, true, spec.NoRestore, true, OutputType.Html);
 
         foreach (var (file, _) in spec.Inputs)
         {
@@ -418,7 +418,7 @@ public static class DocfxTest
     {
         var name = Path.GetFileNameWithoutExtension(path);
 
-        if (name.Equals("docfx", PathUtility.PathComparison) ||
+        if (name.Equals("vdocfx", PathUtility.PathComparison) ||
             name.Equals("redirections", PathUtility.PathComparison) ||
             name.StartsWith("."))
         {

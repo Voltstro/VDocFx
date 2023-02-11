@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="dark">
+<html>
 
   <head>
     <meta charset="utf-8" />
@@ -17,7 +17,6 @@
       type="image/x-icon"
       href="{{ page._rel }}favicon.ico">
     <link rel="stylesheet" href="{{ page._rel }}assets/docfx.css">
-    <link rel="stylesheet" href="{{ page._rel }}assets/webfonts.css">
   </head>
 
   <body>
@@ -25,7 +24,7 @@
       {%- include header -%}
     </header>
 
-    <main class="container layout-{{layout}} page-type-{{pageType}}">
+    <main class="container-xxl layout-{{layout}} page-type-{{pageType}}">
       {%- if layout == "conceptual" -%}
         {%- unless disableBreadcrumb -%}
           <nav
@@ -63,7 +62,7 @@
       {%- endif -%}
     </main>
 
-    <footer class="mt-auto py-3">
+    <footer>
       {%- include footer -%}
     </footer>
 

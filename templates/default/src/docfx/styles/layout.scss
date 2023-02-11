@@ -1,6 +1,34 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+@media (min-width: 1400px) {
+  .container-xxl,.container-xl,.container-lg,.container-md,.container-sm,.container {
+      max-width:1584px;
+  }
+}
+
+@media (min-width: 2100px) {
+  .container-xxl,.container-xl,.container-lg,.container-md,.container-sm,.container {
+      max-width: 2020px;
+  }
+}
+
 $aside-break: 1086px;
 
 main.layout-conceptual {
@@ -68,10 +96,31 @@ article {
   margin-bottom: 2em;
 }
 
-header {
-  border-bottom: 1px gray solid;
+footer {
+  margin-top: auto;
+  background-color: var(--detail-color-bg) !important;
+  color: var(--detail-color) !important;
 }
 
-footer {
-  border-top: 1px gray solid;
+footer>.container-xxl {
+  display: flex;
+}
+
+.table {
+  color: var(--bs-body-color);
+}
+
+:root {
+  --bs-body-bg: #1c1e21;
+  --bs-body-color: #fff;
+
+  --detail-color-bg: #1e1e1e;
+  --detail-color: #fff;
+
+  --detail-second-color-bg: #252526;
+}
+
+html[data-theme='light'] {
+  --detail-color-bg: #fff;
+  --detail-color: #1111;
 }

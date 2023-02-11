@@ -72,7 +72,7 @@ internal class BuildScope
         }
 
         var name = Path.GetFileNameWithoutExtension(path);
-        if (name.Equals("docfx", PathUtility.PathComparison))
+        if (name.Equals("vdocfx", PathUtility.PathComparison))
         {
             return ContentType.Unknown;
         }
