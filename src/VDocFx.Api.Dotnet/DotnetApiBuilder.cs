@@ -19,12 +19,13 @@ internal class DotnetApiBuilder : IApiBuilder
         var glob = new Glob(dotnetConfig.Assemblies, null);
         var assemblies = glob.GetMatchesInDirectory(mainDirectory);
 
-        var objPath = Path.Combine(AppData.CacheRoot, "obj");
+        var objPath = Path.Combine(AppData.CacheRoot, Guid.NewGuid().ToString(), "obj");
         var dllDirectory = Path.Combine(objPath, "dll");
         var latestDllDirectory = Path.Combine(dllDirectory, "latest");
         var xmlDirectory = Path.Combine(objPath, "xml");
         var apiOutputDirectory = Path.Combine(outputDirectory, dotnetConfig.Dest);
 
+        //Unlikely lmao
         if (Directory.Exists(objPath))
             Directory.Delete(objPath, true);
 
@@ -72,5 +73,7 @@ internal class DotnetApiBuilder : IApiBuilder
         });
 
         ECMA2YamlConverter.Run(xmlDirectory, outputDirectory: apiOutputDirectory, config: new() { NoMonikers = true });
+
+        Directory.Delete(objPath, true);
     }
 }
