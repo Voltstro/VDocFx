@@ -95,20 +95,6 @@ function createChildHtmlIds(model: any): any {
 	}
 }
 
-function updateDerivedClasses(model: any): void {
-	var maxDerivedDisplayCount = 5;
-	if (model.derivedClassesWithMoniker) {
-		if (model.derivedClassesWithMoniker.length > maxDerivedDisplayCount) {
-			var hiddenDerivedClassesWithMoniker = [];
-			while (model.derivedClassesWithMoniker.length > maxDerivedDisplayCount) {
-				hiddenDerivedClassesWithMoniker.unshift(model.derivedClassesWithMoniker.pop());
-			}
-
-			model.hiddenDerivedClassesWithMoniker = hiddenDerivedClassesWithMoniker;
-		}
-	}
-}
-
 function updateReturns(model: any): void {
 	if (model.returnsWithMoniker) {
 		for (var i = 0; i < model.returnsWithMoniker.type.length; i++) {
@@ -335,9 +321,6 @@ function updateMonikerizedProperties(model: any): void {
 	if (model.derivedClassesWithMoniker && model.derivedClassesWithMoniker.length > 0) {
 		model.hasDerivedClassesWithMoniker = true;
 		updateMonikerizedArray(model.derivedClassesWithMoniker);
-		if (model.hiddenDerivedClassesWithMoniker && model.hiddenDerivedClassesWithMoniker.length > 0) {
-			updateMonikerizedArray(model.hiddenDerivedClassesWithMoniker);
-		}
 	}
 }
 
@@ -454,7 +437,6 @@ exports.updatePackages = updatePackages;
 exports.setRootName = setRootName;
 exports.setThreadSafety = setThreadSafety;
 exports.createChildHtmlIds = createChildHtmlIds;
-exports.updateDerivedClasses = updateDerivedClasses;
 exports.appendInheritedMembers = appendInheritedMembers;
 exports.htmlEncodeTypeName = htmlEncodeTypeName;
 exports.updateTypeParameters = updateTypeParameters;

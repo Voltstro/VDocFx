@@ -5,7 +5,6 @@ exports.transform = function (model: any): any {
 	model._op_templateFilename = 'NetType';
 	dotnet.updateTitle(model, true, model.__global[model.type]);
 
-	dotnet.updateDerivedClasses(model);
 	dotnet.updateAssemblies(model);
 	dotnet.updatePackages(model);
 	dotnet.setRootName(model);
