@@ -9,7 +9,7 @@ namespace Microsoft.Docs.MarkdigExtensions;
 
 public class QuoteSectionNoteParser : BlockParser
 {
-    private readonly List<string> _noteTypes = new() { "[!NOTE]", "[!TIP]", "[!WARNING]", "[!IMPORTANT]", "[!CAUTION]" };
+    private readonly List<string> _noteTypes = new() { "[!INFO]", "[!WARNING]", "[!DANGER]", "[!SUCCESS]" };
     private readonly string _learnVideoUrl = "https://learn-video.azurefd.net/vod/player?id=";
     private readonly MarkdownContext _context;
 

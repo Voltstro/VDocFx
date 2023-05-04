@@ -79,12 +79,16 @@ public class QuoteSectionNoteRender : HtmlObjectRenderer<QuoteSectionNoteBlock>
 
     private void WriteNote(HtmlRenderer renderer, QuoteSectionNoteBlock obj)
     {
-        var noteHeading = _context.GetToken(obj.NoteTypeString.ToLowerInvariant()) ?? $"<h5>{obj.NoteTypeString.ToUpperInvariant()}</h5>";
-        renderer.Write("<div").Write($" class=\"{obj.NoteTypeString.ToUpperInvariant()}\"").WriteAttributes(obj).WriteLine(">");
+        var noteHeading = _context.GetToken(obj.NoteTypeString.ToLowerInvariant()) ?? $"<h5 class=\"alert-heading\">{obj.NoteTypeString.ToUpperInvariant()}</h5>";
+
+        renderer.Write("<div").Write($" class=\"alert alert-{obj.NoteTypeString.ToLowerInvariant()}\"").WriteAttributes(obj).WriteLine(">");
+
         var savedImplicitParagraph = renderer.ImplicitParagraph;
         renderer.ImplicitParagraph = false;
-        renderer.WriteLine(noteHeading);
-        renderer.WriteChildren(obj);
+        {
+            renderer.WriteLine(noteHeading);
+            renderer.WriteChildren(obj);
+        }
         renderer.ImplicitParagraph = savedImplicitParagraph;
         renderer.WriteLine("</div>");
     }

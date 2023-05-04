@@ -3,15 +3,6 @@
 
 import { meta } from "./utility";
 
-// Styling for alerts.
-export function renderAlerts() {
-  document.querySelectorAll('.NOTE').forEach(e => e.classList.add('alert'));
-  document.querySelectorAll('.TIP').forEach(e => e.classList.add('alert'));
-  document.querySelectorAll('.CAUTION').forEach(e => e.classList.add('alert'));
-  document.querySelectorAll('.WARNING').forEach(e => e.classList.add('alert'));
-  document.querySelectorAll('.IMPORTANT').forEach(e => e.classList.add('alert'));
-}
-
 // Open external links to different host in a new window.
 export function renderLinks() {
   if (meta('docfx:newtab') === 'true') {
