@@ -3,18 +3,6 @@
 
 import { meta } from "./utility";
 
-// Styling for tables in conceptual documents using Bootstrap.
-// See http://getbootstrap.com/css/#tables
-export function renderTables() {
-  document.querySelectorAll('table').forEach(table => {
-    table.classList.add('table', 'table-bordered')
-    const wrapper = document.createElement('div')
-    wrapper.className = 'table-responsive'
-    table.parentElement.insertBefore(wrapper, table)
-    wrapper.appendChild(table)
-  })
-}
-
 // Styling for alerts.
 export function renderAlerts() {
   document.querySelectorAll('.NOTE').forEach(e => e.classList.add('alert'));

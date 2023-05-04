@@ -8,7 +8,7 @@ import 'bootstrap/js/dist/collapse'
 
 import { enableAnchor } from './scripts/anchor'
 import { highlight } from './scripts/highlight'
-import { renderAlerts, renderLinks, renderTables, renderTabs } from './scripts/markdown'
+import { renderAlerts, renderLinks, renderTabs } from './scripts/markdown'
 import { renderAside, renderNavbar } from './scripts/nav'
 import { renderToc } from './scripts/toc'
 
@@ -20,7 +20,6 @@ function onContentLoad() {
   enableAnchor()
   highlight()
 
-  renderTables()
   renderAlerts()
   renderLinks()
 
