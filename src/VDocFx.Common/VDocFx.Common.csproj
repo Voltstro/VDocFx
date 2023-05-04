@@ -13,17 +13,17 @@
   </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="7.0.0" />
       <PackageReference Include="Microsoft.Experimental.Collections" Version="1.0.6-e190117-3" />
       <PackageReference Include="Jint" Version="3.0.0-beta-2046" />
-      <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0182" />
-      <PackageReference Include="Markdig" Version="0.30.4" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+      <PackageReference Include="LibGit2Sharp" Version="0.27.2" />
+      <PackageReference Include="Markdig" Version="0.31.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="HtmlReaderWriter" Version="1.0.0" />
       <PackageReference Include="O9d.Json.Formatting" Version="0.1.0" />
       <PackageReference Include="Polly" Version="7.2.3" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-      <PackageReference Include="YamlDotNet" Version="12.3.1" />
+      <PackageReference Include="YamlDotNet" Version="13.1.0" />
     </ItemGroup>
 
     <ItemGroup>
