@@ -25,10 +25,10 @@
 
   <ItemGroup>
     <PackageReference Include="DotLiquid" Version="2.2.692" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.10" />
     <PackageReference Include="Stubble.Core" Version="1.10.8" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.128" PrivateAssets="all" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

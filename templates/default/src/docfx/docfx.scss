@@ -22,7 +22,11 @@ $container-max-widths: (
         xl: 1300px,
         xxl: 1800px
 ) !default;
-//$font-family-sans-serif: 'Roboto', sans-serif;
+
+//Fonts
+@import "@fontsource/roboto/400";
+@import "@fontsource/roboto/900";
+$font-family-sans-serif: 'Roboto', sans-serif;
 
 @import 'bootstrap/scss/bootstrap.scss';
 @import 'highlight.js/styles/github-dark.css';
