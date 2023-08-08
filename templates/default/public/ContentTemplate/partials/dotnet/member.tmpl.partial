@@ -28,8 +28,6 @@
 	{{>partials/dotnet/security}}
 {{/hasPermissions}}
 
-{{>partials/dotnet/moniker}}
-
 {{#threadSafety}}
 	<h2>{{__global.threadSafety}}</h2>
 	{{{threadSafety}}}

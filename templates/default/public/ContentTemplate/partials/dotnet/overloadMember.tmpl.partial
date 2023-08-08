@@ -44,7 +44,6 @@
     	<h3>{{__global.seeAlso}}</h3>
     	{{{ . }}}
     {{/seeAlso}}
-    {{>partials/dotnet/monikerOverloadMember}}
 </div>
 
 </div>

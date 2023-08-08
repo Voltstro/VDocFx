@@ -10,19 +10,6 @@
 }
 
 main.page-type-reference {
-  .is-hidden {
-    display: none;
-  }
-
-  details {
-    display: none;
-  }
-
-  h2.appliesTo,
-  h3.appliesTo {
-    display: none;
-  }
-
   dl.attributeList {
     display: flex;
     margin: .25em 0;
