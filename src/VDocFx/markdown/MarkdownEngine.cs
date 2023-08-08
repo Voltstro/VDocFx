@@ -196,6 +196,10 @@ internal class MarkdownEngine
             // Extensions after this line sees an expanded inclusion AST only once.
             .UseResolveLink(_markdownContext)
             .UseXref(GetXref)
+
+            //Bootstrap theming
+            .UseBootstrap()
+
             .UseHtml(GetErrors, GetLink, GetXref, _htmlSanitizer)
             .UseExtractTitle(this, GetConceptual);
     }
