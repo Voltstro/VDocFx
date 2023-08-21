@@ -9,7 +9,7 @@ public static class GitHubAccessorTest
 {
     private static readonly string s_token = Environment.GetEnvironmentVariable("DOCS_GITHUB_TOKEN");
     private static readonly Config s_config = JsonUtility.DeserializeData<Config>("", null);
-    private static readonly GitHubAccessor s_github = new(s_config, s_token);
+    private static readonly GitHubAccessor s_github = new(s_config);
 
     [SkippableTheory]
     [InlineData("OsmondJiang", 19990166, "Osmond Jiang", "OsmondJiang")]
