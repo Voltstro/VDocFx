@@ -66,7 +66,7 @@ internal class DocsetBuilder
         _sourceMap = _errors.SourceMap = new(_errors, new(_buildOptions.DocsetPath), _config, _fileResolver);
         _input = new(_buildOptions, _config, _packageResolver, _repositoryProvider, _sourceMap, package);
         _buildScope = new(_config, _input, _buildOptions);
-        _githubAccessor = new(_config, TestQuirks.OpsGetAccessTokenProxy?.Invoke(null));
+        _githubAccessor = new(_config);
         _jsonSchemaLoader = new(_fileResolver);
         _metadataProvider = _errors.MetadataProvider = new(_config, _input, _buildScope);
         _monikerProvider = new(_config, _buildScope, _metadataProvider, _fileResolver);

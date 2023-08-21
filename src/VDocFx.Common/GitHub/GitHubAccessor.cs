@@ -12,8 +12,12 @@ using Polly.Extensions.Http;
 
 namespace Microsoft.Docs.Build;
 
+/// <summary>
+///     Access to GitHub's API
+/// </summary>
 internal sealed class GitHubAccessor
 {
+    private const string GithubApiEnvironmentVariableName = "DOCS_GITHUB_TOKEN";
     private static readonly Uri s_url = new("https://api.github.com/graphql");
 
     private readonly HttpClient? _httpClient;
@@ -23,18 +27,21 @@ internal sealed class GitHubAccessor
 
     private volatile Error? _fatalError;
 
-    public GitHubAccessor(Config config, string? githubToken)
+    public GitHubAccessor(Config config)
     {
         _userCache = new(
             AppData.GitHubUserCachePath,
             TimeSpan.FromHours(config.GithubUserCacheExpirationInHours),
             StringComparer.OrdinalIgnoreCase,
             ResolveGitHubUserConflict);
-        if (!string.IsNullOrEmpty(githubToken))
+
+        string? apiTokenValue = Environment.GetEnvironmentVariable(GithubApiEnvironmentVariableName);
+
+        if (!string.IsNullOrEmpty(apiTokenValue))
         {
             _httpClient = new HttpClient(new HttpClientHandler { CheckCertificateRevocationList = true });
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "DocFX");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", githubToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", apiTokenValue);
         }
     }
 
